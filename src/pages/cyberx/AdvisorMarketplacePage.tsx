@@ -35,7 +35,7 @@ export function AdvisorMarketplacePage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                <Star className="h-3.5 w-3.5 fill-[hsl(48_96%_53%)] text-[hsl(48_96%_53%)]" />
                 {a.rating} · {a.installs} installs
               </div>
               <Button
