@@ -14,7 +14,7 @@ import {
   ShieldCheck, Lock, FileText, Users, AlertTriangle, Eye, Scale, Globe, Server,
   Plus, Upload, Loader2, Trash2, ChevronDown, ChevronRight, Pencil,
   CheckCircle2, XCircle, Clock, Download, History, Search, Filter,
-  BookOpen, ClipboardCheck, BarChart3, RefreshCw
+  BookOpen, ClipboardCheck, BarChart3, RefreshCw, Shield
 } from "lucide-react";
 
 /* ── Types ──────────────────────────────────── */
