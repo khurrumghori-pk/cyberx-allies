@@ -406,6 +406,68 @@ export type Database = {
         }
         Relationships: []
       }
+      twin_conversation_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "twin_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          target_id: string
+          target_name: string
+          target_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          target_id: string
+          target_name: string
+          target_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          target_id?: string
+          target_name?: string
+          target_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       twin_memories: {
         Row: {
           advisor_id: string
