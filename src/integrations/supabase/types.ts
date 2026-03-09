@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisors: {
+        Row: {
+          access_roles: string[] | null
+          avatar_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          graph_nodes: string[] | null
+          id: string
+          knowledge_refs: string[] | null
+          model_config: Json | null
+          name: string
+          persona_profile: Json
+          prompt_dna: Json
+          role: string
+          sessions_count: number | null
+          state: string
+          telemetry_enabled: boolean | null
+          tenant_id: string
+          tier: string | null
+          updated_at: string
+          vector_index: string | null
+        }
+        Insert: {
+          access_roles?: string[] | null
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          graph_nodes?: string[] | null
+          id?: string
+          knowledge_refs?: string[] | null
+          model_config?: Json | null
+          name: string
+          persona_profile?: Json
+          prompt_dna?: Json
+          role: string
+          sessions_count?: number | null
+          state?: string
+          telemetry_enabled?: boolean | null
+          tenant_id: string
+          tier?: string | null
+          updated_at?: string
+          vector_index?: string | null
+        }
+        Update: {
+          access_roles?: string[] | null
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          graph_nodes?: string[] | null
+          id?: string
+          knowledge_refs?: string[] | null
+          model_config?: Json | null
+          name?: string
+          persona_profile?: Json
+          prompt_dna?: Json
+          role?: string
+          sessions_count?: number | null
+          state?: string
+          telemetry_enabled?: boolean | null
+          tenant_id?: string
+          tier?: string | null
+          updated_at?: string
+          vector_index?: string | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
