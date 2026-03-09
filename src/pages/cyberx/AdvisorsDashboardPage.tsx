@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { AdvisorCard } from "@/components/cyberx/AdvisorCard";
 import { ADVISORS } from "@/data/cyberx-advisors";
@@ -6,6 +7,8 @@ import { PersonalitySummaryCard } from "@/components/cyberx/PersonalitySummaryCa
 import { MyDigitalTwinCard } from "@/components/cyberx/MyDigitalTwinCard";
 import { Activity, ShieldAlert, Cpu, TrendingUp } from "lucide-react";
 import heroBanner from "@/assets/cyberx-hero-banner.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; sub: string; icon: React.FC<{ className?: string }> }) => (
   <div className="cyberx-kpi space-y-2">
