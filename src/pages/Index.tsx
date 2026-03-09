@@ -274,7 +274,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </ScrollFadeIn>
 
       {/* Footer */}
       <footer className="border-t border-border/40 py-8">
