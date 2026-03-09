@@ -47,6 +47,17 @@ const TONE_OPTIONS = ["Professional", "Concise", "Conversational", "Technical", 
 const DECISION_STYLES = ["Conservative", "Balanced", "Aggressive"];
 const RISK_TOLERANCES = ["Risk-Averse", "Moderate", "Risk-Taking"];
 
+interface MBTIResult {
+  type: string;
+  label: string;
+  description: string;
+  dimensions: { axis: string; label: string; value: number }[];
+}
+
+interface PsychometricResult {
+  traits: { trait: string; label: string; score: number; description: string }[];
+}
+
 interface AdvisorDraft {
   name: string;
   role: string;
@@ -59,6 +70,8 @@ interface AdvisorDraft {
     decision_style: string;
     risk_tolerance: string;
     vocabulary: string;
+    mbti?: MBTIResult;
+    psychometric?: PsychometricResult;
   };
   prompt_dna: {
     system_instructions: string;
