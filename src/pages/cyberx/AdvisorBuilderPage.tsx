@@ -574,36 +574,108 @@ export function AdvisorBuilderPage() {
             <div className="space-y-3 pt-4 border-t border-border/40">
               <label className="text-xs font-medium text-muted-foreground">Personality & Psychometric Profiling</label>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+                {/* MBTI Card */}
+                <div className={cn(
+                  "rounded-xl border p-4 space-y-3",
+                  draft.persona_profile.mbti ? "border-accent/50 bg-accent/5" : "border-primary/30 bg-primary/5"
+                )}>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
                       <Brain className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground">MBTI Assessment</p>
                       <p className="text-[10px] text-muted-foreground">Cognitive personality type (e.g. INTJ, ENTP)</p>
                     </div>
+                    {draft.persona_profile.mbti && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-accent/20 border border-accent/40 px-2.5 py-1">
+                        <CheckCircle className="h-3 w-3 text-accent" />
+                        <span className="text-xs font-bold text-accent">{draft.persona_profile.mbti.type}</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">8 cybersecurity-contextualized questions to determine how the advisor processes information and makes decisions.</p>
-                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/mbti")}>
-                    Start MBTI Test <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
+                  {draft.persona_profile.mbti ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">{draft.persona_profile.mbti.description || draft.persona_profile.mbti.label}</p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {draft.persona_profile.mbti.dimensions?.map((d) => (
+                          <div key={d.axis} className="rounded-md bg-primary/10 border border-primary/20 p-1.5 text-center">
+                            <span className="text-[10px] font-bold text-primary">{d.value}%</span>
+                            <p className="text-[8px] text-muted-foreground">{d.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, mbti: undefined } }))}>
+                        <X className="h-3 w-3 mr-1" /> Clear Result
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">8 cybersecurity-contextualized questions or upload existing results.</p>
+                      <div className="flex gap-2">
+                        <Button variant="neon" size="sm" className="flex-1" onClick={() => navigate("/advisors/builder/mbti")}>
+                          Start Test <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1" onClick={() => mbtiFileRef.current?.click()}>
+                          <FileUp className="h-3.5 w-3.5" /> Upload
+                        </Button>
+                        <input ref={mbtiFileRef} type="file" accept=".json" className="hidden" onChange={handleFileUpload("mbti")} />
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3">
+                {/* Psychometric Card */}
+                <div className={cn(
+                  "rounded-xl border p-4 space-y-3",
+                  draft.persona_profile.psychometric ? "border-accent/50 bg-accent/5" : "border-accent/30 bg-accent/5"
+                )}>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center">
                       <Activity className="h-5 w-5 text-accent" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground">Psychometric Profile</p>
                       <p className="text-[10px] text-muted-foreground">Big Five+ trait analysis (8 dimensions)</p>
                     </div>
+                    {draft.persona_profile.psychometric && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-accent/20 border border-accent/40 px-2.5 py-1">
+                        <CheckCircle className="h-3 w-3 text-accent" />
+                        <span className="text-xs font-medium text-accent">{draft.persona_profile.psychometric.traits.length} traits</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">16 Likert-scale statements measuring openness, conscientiousness, resilience, analytical rigor, and more.</p>
-                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/psychometric")}>
-                    Start Psychometric Test <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
+                  {draft.persona_profile.psychometric ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {draft.persona_profile.psychometric.traits.slice(0, 4).map((t) => (
+                          <div key={t.trait} className="flex items-center justify-between rounded-md bg-accent/10 border border-accent/20 px-2 py-1">
+                            <span className="text-[9px] text-muted-foreground">{t.label}</span>
+                            <span className="text-[10px] font-bold text-accent">{t.score}%</span>
+                          </div>
+                        ))}
+                      </div>
+                      {draft.persona_profile.psychometric.traits.length > 4 && (
+                        <p className="text-[9px] text-muted-foreground text-center">+{draft.persona_profile.psychometric.traits.length - 4} more traits</p>
+                      )}
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, psychometric: undefined } }))}>
+                        <X className="h-3 w-3 mr-1" /> Clear Result
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">16 Likert-scale statements or upload existing results.</p>
+                      <div className="flex gap-2">
+                        <Button variant="neon" size="sm" className="flex-1" onClick={() => navigate("/advisors/builder/psychometric")}>
+                          Start Test <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1" onClick={() => psychoFileRef.current?.click()}>
+                          <FileUp className="h-3.5 w-3.5" /> Upload
+                        </Button>
+                        <input ref={psychoFileRef} type="file" accept=".json" className="hidden" onChange={handleFileUpload("psychometric")} />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
