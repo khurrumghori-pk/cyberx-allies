@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, MessageSquare, Bot, Users, Brain,
   ShoppingBag, BarChart2, PlugZap, Shield, Bell,
-  ChevronRight, Menu, X, ExternalLink, LogOut, User, Download
+  ChevronRight, Menu, X, ExternalLink, LogOut, User, Download, UserCog
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -19,6 +19,7 @@ const NAV: NavItem[] = [
   { label: "Multi-Agent Chat", href: "/advisors/chat", icon: MessageSquare },
   { label: "Advisor Builder", href: "/advisors/builder", icon: Bot },
   { label: "Team Digital Twin", href: "/advisors/team-twin", icon: Users },
+  { label: "Twin Management", href: "/advisors/twin-admin", icon: UserCog },
   { label: "Cyber Memory", href: "/advisors/memory", icon: Brain },
   { label: "Marketplace", href: "/advisors/marketplace", icon: ShoppingBag },
   { label: "Analytics", href: "/advisors/analytics", icon: BarChart2 },

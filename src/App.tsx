@@ -21,6 +21,7 @@ import { IntegrationPanelPage } from "./pages/cyberx/IntegrationPanelPage";
 import { GovernancePanelPage } from "./pages/cyberx/GovernancePanelPage";
 import { ProactiveNotificationsPage } from "./pages/cyberx/ProactiveNotificationsPage";
 import { InstallPage } from "./pages/cyberx/InstallPage";
+import { AdminTwinAssignmentPage } from "./pages/cyberx/AdminTwinAssignmentPage";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,11 @@ const App = () => (
             <Route path="/advisors/notifications" element={
               <ProtectedRoute>
                 <ProactiveNotificationsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisors/twin-admin" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminTwinAssignmentPage />
               </ProtectedRoute>
             } />
             <Route path="/install" element={<InstallPage />} />
