@@ -49,6 +49,16 @@ const App = () => (
                 <AdvisorBuilderPage />
               </ProtectedRoute>
             } />
+            <Route path="/advisors/builder/mbti" element={
+              <ProtectedRoute allowedRoles={["admin", "vciso"]}>
+                <MBTITestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisors/builder/psychometric" element={
+              <ProtectedRoute allowedRoles={["admin", "vciso"]}>
+                <PsychometricTestPage />
+              </ProtectedRoute>
+            } />
             <Route path="/advisors/team-twin" element={
               <ProtectedRoute>
                 <TeamDigitalTwinPage />
