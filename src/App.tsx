@@ -23,6 +23,7 @@ import { ProactiveNotificationsPage } from "./pages/cyberx/ProactiveNotification
 import { InstallPage } from "./pages/cyberx/InstallPage";
 import { AdminTwinAssignmentPage } from "./pages/cyberx/AdminTwinAssignmentPage";
 import { TwinMemoryPage } from "./pages/cyberx/TwinMemoryPage";
+import { OrgChartPage } from "./pages/cyberx/OrgChartPage";
 
 const queryClient = new QueryClient();
 
