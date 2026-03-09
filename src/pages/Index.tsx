@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HeroDemoWalkthrough from "@/components/cyberx/HeroDemoWalkthrough";
+import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 
 const METRICS = [
   { value: "6", label: "AI Advisors", sub: "Active digital twins" },
@@ -142,12 +143,14 @@ const Index = () => {
       <section className="py-16 border-y border-border/40 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {METRICS.map((m) => (
-              <div key={m.label} className="text-center space-y-1">
-                <p className="font-display text-3xl md:text-4xl text-foreground">{m.value}</p>
-                <p className="text-sm font-semibold text-primary">{m.label}</p>
-                <p className="text-xs text-muted-foreground">{m.sub}</p>
-              </div>
+            {METRICS.map((m, i) => (
+              <ScrollFadeIn key={m.label} delay={i * 100}>
+                <div className="text-center space-y-1">
+                  <p className="font-display text-3xl md:text-4xl text-foreground">{m.value}</p>
+                  <p className="text-sm font-semibold text-primary">{m.label}</p>
+                  <p className="text-xs text-muted-foreground">{m.sub}</p>
+                </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
@@ -156,23 +159,27 @@ const Index = () => {
       {/* Features */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Platform Capabilities</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground">
-              Enterprise Security, Reimagined with AI
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Every feature built to SRS specification — from multi-agent orchestration to zero trust governance.
-            </p>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-16 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Platform Capabilities</p>
+              <h2 className="font-display text-3xl md:text-4xl text-foreground">
+                Enterprise Security, Reimagined with AI
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Every feature built to SRS specification — from multi-agent orchestration to zero trust governance.
+              </p>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title} className={cn("rounded-2xl border p-6 space-y-3 transition-all hover:scale-[1.02]", f.bg)}>
-                <f.icon className={cn("h-8 w-8", f.color)} />
-                <h3 className="font-display text-lg text-foreground">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </div>
+            {FEATURES.map((f, i) => (
+              <ScrollFadeIn key={f.title} delay={i * 80}>
+                <div className={cn("rounded-2xl border p-6 space-y-3 transition-all hover:scale-[1.02] h-full", f.bg)}>
+                  <f.icon className={cn("h-8 w-8", f.color)} />
+                  <h3 className="font-display text-lg text-foreground">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
@@ -181,23 +188,27 @@ const Index = () => {
       {/* Advisor Lineup */}
       <section className="py-20 bg-secondary/30 border-y border-border/40">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-12 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-accent">AI Advisor Roster</p>
-            <h2 className="font-display text-3xl text-foreground">6 Specialized Digital Twins</h2>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-12 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent">AI Advisor Roster</p>
+              <h2 className="font-display text-3xl text-foreground">6 Specialized Digital Twins</h2>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ADVISORS_PREVIEW.map((a) => (
-              <div key={a.name} className="cyberx-panel p-5 flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-                  <Bot className="h-6 w-6 text-primary" />
+            {ADVISORS_PREVIEW.map((a, i) => (
+              <ScrollFadeIn key={a.name} delay={i * 80}>
+                <div className="cyberx-panel p-5 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+                    <Bot className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{a.name}</p>
+                    <p className="text-xs text-muted-foreground">{a.role}</p>
+                  </div>
+                  <span className="ml-auto cyberx-pill text-[10px]">{a.tier}</span>
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground">{a.name}</p>
-                  <p className="text-xs text-muted-foreground">{a.role}</p>
-                </div>
-                <span className="ml-auto cyberx-pill text-[10px]">{a.tier}</span>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
@@ -206,29 +217,33 @@ const Index = () => {
       {/* Social Proof */}
       <section className="py-20">
         <div className="mx-auto max-w-5xl px-6">
-          <div className="text-center mb-12 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Trusted by Security Leaders</p>
-            <h2 className="font-display text-3xl text-foreground">What CISOs Are Saying</h2>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-12 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Trusted by Security Leaders</p>
+              <h2 className="font-display text-3xl text-foreground">What CISOs Are Saying</h2>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-6 md:grid-cols-2">
             {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="cyberx-panel p-6 space-y-4">
-                <div className="flex gap-1">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-primary text-primary" />)}
+              <ScrollFadeIn key={i} delay={i * 120}>
+                <div className="cyberx-panel p-6 space-y-4">
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-primary text-primary" />)}
+                  </div>
+                  <p className="text-sm text-foreground italic leading-relaxed">"{t.quote}"</p>
+                  <div className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">{t.author}</span> · {t.company}
+                  </div>
                 </div>
-                <p className="text-sm text-foreground italic leading-relaxed">"{t.quote}"</p>
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">{t.author}</span> · {t.company}
-                </div>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <ScrollFadeIn>
         <div className="mx-auto max-w-3xl px-6">
           <div className="cyberx-panel cyberx-signature-glow p-10 text-center space-y-6">
             <Shield className="h-12 w-12 text-primary mx-auto" />
@@ -259,7 +274,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </ScrollFadeIn>
 
       {/* Footer */}
       <footer className="border-t border-border/40 py-8">
