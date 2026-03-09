@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_training_jobs: {
+        Row: {
+          advisor_id: string
+          chunks_processed: number | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          error_message: string | null
+          id: string
+          knowledge_sources: string[] | null
+          started_at: string | null
+          status: string
+          total_chunks: number | null
+        }
+        Insert: {
+          advisor_id: string
+          chunks_processed?: number | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          error_message?: string | null
+          id?: string
+          knowledge_sources?: string[] | null
+          started_at?: string | null
+          status?: string
+          total_chunks?: number | null
+        }
+        Update: {
+          advisor_id?: string
+          chunks_processed?: number | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          error_message?: string | null
+          id?: string
+          knowledge_sources?: string[] | null
+          started_at?: string | null
+          status?: string
+          total_chunks?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advisor_training_jobs_advisor_id_fkey"
+            columns: ["advisor_id"]
+            isOneToOne: false
+            referencedRelation: "advisors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       advisors: {
         Row: {
           access_roles: string[] | null
@@ -138,6 +188,42 @@ export type Database = {
           session_type?: string
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          advisor: string
+          body: string
+          created_at: string
+          icon_type: string | null
+          id: string
+          read: boolean | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          advisor: string
+          body: string
+          created_at?: string
+          icon_type?: string | null
+          id?: string
+          read?: boolean | null
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          advisor?: string
+          body?: string
+          created_at?: string
+          icon_type?: string | null
+          id?: string
+          read?: boolean | null
+          severity?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
