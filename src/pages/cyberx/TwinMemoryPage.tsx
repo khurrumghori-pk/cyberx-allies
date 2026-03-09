@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search, Plus, X } from "lucide-react";
+import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search, Plus, Pencil, Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,6 +42,11 @@ export function TwinMemoryPage() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newMemory, setNewMemory] = useState({ advisorId: "", type: "fact", content: "" });
   const [adding, setAdding] = useState(false);
+  const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -105,6 +110,91 @@ export function TwinMemoryPage() {
     setAdding(false);
   };
 
+  const openEditDialog = (memory: Memory) => {
+    setEditingMemory({ ...memory });
+    setEditDialogOpen(true);
+  };
+
+  const saveEditedMemory = async () => {
+    if (!editingMemory || !editingMemory.content.trim()) {
+      toast.error("Memory content cannot be empty");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("twin_memories")
+      .update({ content: editingMemory.content.trim(), memory_type: editingMemory.memory_type })
+      .eq("id", editingMemory.id);
+    if (error) {
+      toast.error("Failed to update memory");
+    } else {
+      setMemories(prev => prev.map(m => m.id === editingMemory.id ? { ...m, content: editingMemory.content.trim(), memory_type: editingMemory.memory_type } : m));
+      setEditDialogOpen(false);
+      setEditingMemory(null);
+      toast.success("Memory updated");
+    }
+    setSaving(false);
+  };
+
+  const exportMemories = () => {
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      memories: filteredMemories.map(m => ({
+        advisor_name: getAdvisorName(m.advisor_id),
+        advisor_role: getAdvisorRole(m.advisor_id),
+        memory_type: m.memory_type,
+        content: m.content,
+        created_at: m.created_at,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `twin-memories-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${filteredMemories.length} memories`);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data.memories || !Array.isArray(data.memories)) {
+        throw new Error("Invalid file format");
+      }
+      // Map advisor names/roles back to IDs
+      const importedCount = { success: 0, skipped: 0 };
+      for (const mem of data.memories) {
+        const advisor = advisors.find(a => a.name === mem.advisor_name || a.role === mem.advisor_role);
+        if (!advisor) {
+          importedCount.skipped++;
+          continue;
+        }
+        const { error } = await supabase.from("twin_memories").insert({
+          advisor_id: advisor.id,
+          memory_type: mem.memory_type || "fact",
+          content: mem.content,
+        });
+        if (!error) importedCount.success++;
+        else importedCount.skipped++;
+      }
+      await fetchData();
+      toast.success(`Imported ${importedCount.success} memories${importedCount.skipped > 0 ? `, skipped ${importedCount.skipped}` : ""}`);
+    } catch {
+      toast.error("Failed to import memories. Please check the file format.");
+    }
+    setImporting(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const getAdvisorName = (advisorId: string) => {
     const a = advisors.find(a => a.id === advisorId);
     return a ? a.name : "Unknown";
@@ -142,9 +232,19 @@ export function TwinMemoryPage() {
 
   return (
     <CyberXLayout title="Twin Memory" breadcrumb={["CyberX", "Twin Memory"]}>
-      {/* Header with Add Button */}
-      <div className="flex items-center justify-between">
-        <div />
+      {/* Hidden file input for import */}
+      <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileImport} className="hidden" />
+
+      {/* Header with Actions */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex gap-2">
+          <Button variant="neon" size="sm" onClick={exportMemories} disabled={filteredMemories.length === 0}>
+            <Download className="h-4 w-4" /> Export
+          </Button>
+          <Button variant="neon" size="sm" onClick={handleImportClick} disabled={importing || advisors.length === 0}>
+            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Import
+          </Button>
+        </div>
         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="hero" size="sm">
@@ -205,6 +305,49 @@ export function TwinMemoryPage() {
         </Dialog>
       </div>
 
+      {/* Edit Memory Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="bg-background border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <Pencil className="h-5 w-5 text-primary" /> Edit Memory
+            </DialogTitle>
+          </DialogHeader>
+          {editingMemory && (
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Memory Type</label>
+                <Select value={editingMemory.memory_type} onValueChange={v => setEditingMemory(p => p ? { ...p, memory_type: v } : null)}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fact">Fact</SelectItem>
+                    <SelectItem value="preference">Preference</SelectItem>
+                    <SelectItem value="conversation_pattern">Conversation Pattern</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Memory Content</label>
+                <Textarea
+                  value={editingMemory.content}
+                  onChange={e => setEditingMemory(p => p ? { ...p, content: e.target.value } : null)}
+                  className="bg-secondary border-border min-h-[100px]"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="ghost" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                <Button variant="hero" onClick={saveEditedMemory} disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Pencil className="h-4 w-4" />}
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="cyberx-kpi space-y-1">
@@ -239,7 +382,6 @@ export function TwinMemoryPage() {
       {/* Filters */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex gap-2 flex-wrap">
-          {/* Twin filter */}
           <button
             onClick={() => setFilter("all")}
             className={cn("cyberx-pill text-xs cursor-pointer transition-all", filter === "all" ? "border-primary text-primary" : "text-muted-foreground hover:text-foreground")}
@@ -256,7 +398,6 @@ export function TwinMemoryPage() {
             </button>
           ))}
           <span className="text-border">|</span>
-          {/* Category filter */}
           <button
             onClick={() => setTypeFilter("all")}
             className={cn("cyberx-pill text-xs cursor-pointer transition-all", typeFilter === "all" ? "border-accent text-accent" : "text-muted-foreground hover:text-foreground")}
@@ -307,13 +448,21 @@ export function TwinMemoryPage() {
                   </span>
                 </div>
               </div>
-              <button
-                onClick={() => deleteMemory(m.id)}
-                disabled={deleting === m.id}
-                className="shrink-0 rounded-lg p-2 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
-              >
-                {deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              </button>
+              <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                  onClick={() => openEditDialog(m)}
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => deleteMemory(m.id)}
+                  disabled={deleting === m.id}
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+                >
+                  {deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           ))}
         </div>
