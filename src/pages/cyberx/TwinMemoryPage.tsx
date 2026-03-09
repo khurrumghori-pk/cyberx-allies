@@ -3,7 +3,7 @@ import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Brain, Trash2, Loader2, Bot, Calendar, Tag } from "lucide-react";
+import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,8 @@ export function TwinMemoryPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -96,7 +98,11 @@ export function TwinMemoryPage() {
   };
 
   const uniqueAdvisorIds = [...new Set(memories.map(m => m.advisor_id))];
-  const filteredMemories = filter === "all" ? memories : memories.filter(m => m.advisor_id === filter);
+  const uniqueTypes = [...new Set(memories.map(m => m.memory_type))];
+  const filteredMemories = memories
+    .filter(m => filter === "all" || m.advisor_id === filter)
+    .filter(m => typeFilter === "all" || m.memory_type === typeFilter)
+    .filter(m => !search || m.content.toLowerCase().includes(search.toLowerCase()));
 
   if (loading) {
     return (
@@ -128,9 +134,21 @@ export function TwinMemoryPage() {
         </div>
       </div>
 
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search memories…"
+          className="w-full rounded-lg border border-border/80 bg-secondary/60 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
+        />
+      </div>
+
       {/* Filters */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex gap-2 flex-wrap">
+          {/* Twin filter */}
           <button
             onClick={() => setFilter("all")}
             className={cn("cyberx-pill text-xs cursor-pointer transition-all", filter === "all" ? "border-primary text-primary" : "text-muted-foreground hover:text-foreground")}
@@ -146,10 +164,27 @@ export function TwinMemoryPage() {
               <Bot className="h-3 w-3" /> {getAdvisorName(id)}
             </button>
           ))}
+          <span className="text-border">|</span>
+          {/* Category filter */}
+          <button
+            onClick={() => setTypeFilter("all")}
+            className={cn("cyberx-pill text-xs cursor-pointer transition-all", typeFilter === "all" ? "border-accent text-accent" : "text-muted-foreground hover:text-foreground")}
+          >
+            All Types
+          </button>
+          {uniqueTypes.map(t => (
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={cn("cyberx-pill text-xs cursor-pointer transition-all flex items-center gap-1", typeFilter === t ? "border-accent text-accent" : "text-muted-foreground hover:text-foreground", TYPE_STYLES[t])}
+            >
+              <Tag className="h-3 w-3" /> {t.replace(/_/g, " ")}
+            </button>
+          ))}
         </div>
         {filteredMemories.length > 0 && (
           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={clearAll}>
-            <Trash2 className="h-3.5 w-3.5 mr-1" /> Clear {filter === "all" ? "All" : "Filtered"}
+            <Trash2 className="h-3.5 w-3.5 mr-1" /> Clear {filter === "all" && typeFilter === "all" ? "All" : "Filtered"} ({filteredMemories.length})
           </Button>
         )}
       </div>

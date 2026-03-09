@@ -7,6 +7,8 @@ import { AdvisorAvatar } from "@/components/cyberx/AdvisorAvatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/advisor-chat`;
 
@@ -58,6 +60,7 @@ async function streamAdvisorResponse({
   userMessage,
   conversationHistory,
   advisorRole,
+  advisorId,
   onDelta,
   onDone,
   signal,
@@ -65,6 +68,7 @@ async function streamAdvisorResponse({
   userMessage: string;
   conversationHistory: { role: "user" | "assistant"; content: string }[];
   advisorRole: string;
+  advisorId?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   signal?: AbortSignal;
@@ -80,7 +84,7 @@ async function streamAdvisorResponse({
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages, advisorRole }),
+    body: JSON.stringify({ messages, advisorRole, advisorId }),
     signal,
   });
 
@@ -202,12 +206,27 @@ function ConsensusPanel({ messages }: { messages: Message[] }) {
 }
 
 export function MultiAgentChatPage() {
+  const { user } = useAuth();
   const active = ADVISORS.slice(0, 4);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streamingAdvisors, setStreamingAdvisors] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [advisorIdMap, setAdvisorIdMap] = useState<Record<string, string>>({});
+
+  // Fetch advisor IDs for passive learning
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("advisors").select("id, role").or(`assigned_user_id.eq.${user.id},tenant_id.eq.${user.id}`)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach(a => { map[a.role] = a.id; });
+          setAdvisorIdMap(map);
+        }
+      });
+  }, [user]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -256,6 +275,7 @@ export function MultiAgentChatPage() {
 
         try {
           await streamAdvisorResponse({
+            advisorId: advisorIdMap[role],
             userMessage: `${userText}\n\n[Context: You are part of a multi-advisor collaboration room with SOC Analyst, Threat Intel, Incident Response, and vCISO advisors. Provide your perspective based on your role. Be concise. Always include a confidence level (HIGH/MEDIUM/LOW) at the end of your response.]`,
             conversationHistory: [
               ...history,
