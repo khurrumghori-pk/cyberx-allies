@@ -3,7 +3,7 @@ import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Brain, Trash2, Loader2, Bot, Calendar, Tag } from "lucide-react";
+import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
