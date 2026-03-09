@@ -26,6 +26,7 @@ const TIER_COLORS: Record<Advisor["tier"], string> = {
 
 interface AdvisorCardProps {
   advisor: Advisor;
+  memoryCount?: number;
 }
 
 export function AdvisorCard({ advisor }: AdvisorCardProps) {
