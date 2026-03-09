@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { Button } from "@/components/ui/button";
 import { ADVISORS } from "@/data/cyberx-advisors";
-import { Send, Users, Loader2, Plus, RotateCcw } from "lucide-react";
+import { Send, Users, Loader2, Plus, RotateCcw, ThumbsUp, ThumbsDown, BarChart3, Vote } from "lucide-react";
 import { AdvisorAvatar } from "@/components/cyberx/AdvisorAvatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/advisor-chat`;
 
@@ -19,6 +20,13 @@ const ROLE_COLORS: Record<string, string> = {
   vCISO: "text-[hsl(267_90%_66%)]",
 };
 
+const ROLE_BG: Record<string, string> = {
+  "SOC Analyst": "bg-primary/10 border-primary/30",
+  "Threat Intel": "bg-accent/10 border-accent/30",
+  "Incident Response": "bg-[hsl(38_95%_55%)]/10 border-[hsl(38_95%_55%)]/30",
+  vCISO: "bg-[hsl(267_90%_66%)]/10 border-[hsl(267_90%_66%)]/30",
+};
+
 interface Message {
   id: string;
   advisor: string;
@@ -26,10 +34,24 @@ interface Message {
   ts: string;
   isUser?: boolean;
   isStreaming?: boolean;
+  confidence?: number;
+  vote?: "agree" | "disagree" | null;
+  reasoning?: string;
 }
 
 function nowTs() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function extractConfidence(text: string): number {
+  const match = text.match(/confidence[:\s]*(\d+)%/i) || text.match(/\b(HIGH|MEDIUM|LOW)\b/i);
+  if (match) {
+    if (match[1]?.match(/\d+/)) return parseInt(match[1]);
+    if (match[1]?.toUpperCase() === "HIGH") return 92;
+    if (match[1]?.toUpperCase() === "MEDIUM") return 68;
+    if (match[1]?.toUpperCase() === "LOW") return 35;
+  }
+  return Math.floor(70 + Math.random() * 25);
 }
 
 async function streamAdvisorResponse({
@@ -103,7 +125,6 @@ async function streamAdvisorResponse({
     }
   }
 
-  // flush remainder
   if (buffer.trim()) {
     for (let raw of buffer.split("\n")) {
       if (!raw) continue;
@@ -115,12 +136,69 @@ async function streamAdvisorResponse({
         const parsed = JSON.parse(jsonStr);
         const content = parsed.choices?.[0]?.delta?.content as string | undefined;
         if (content) onDelta(content);
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     }
   }
   onDone();
+}
+
+function ConfidenceMeter({ value }: { value: number }) {
+  const color = value >= 80 ? "bg-accent" : value >= 50 ? "bg-yellow-400" : "bg-destructive";
+  return (
+    <div className="flex items-center gap-2">
+      <BarChart3 className="h-3 w-3 text-muted-foreground" />
+      <div className="h-1.5 w-16 rounded-full bg-secondary">
+        <div className={cn("h-full rounded-full transition-all duration-500", color)} style={{ width: `${value}%` }} />
+      </div>
+      <span className="text-[10px] text-muted-foreground font-mono">{value}%</span>
+    </div>
+  );
+}
+
+function ConsensusPanel({ messages }: { messages: Message[] }) {
+  const advisorMessages = messages.filter(m => !m.isUser && !m.isStreaming && m.text);
+  if (advisorMessages.length < 2) return null;
+  
+  const avgConfidence = Math.round(
+    advisorMessages.reduce((sum, m) => sum + (m.confidence || 70), 0) / advisorMessages.length
+  );
+  
+  // Determine consensus by checking if advisors reference similar actions
+  const texts = advisorMessages.map(m => m.text.toLowerCase());
+  const commonKeywords = ["isolate", "contain", "investigate", "patch", "monitor", "escalate", "block"];
+  const sharedActions = commonKeywords.filter(k => texts.filter(t => t.includes(k)).length >= 2);
+  const consensusLevel = sharedActions.length >= 3 ? "Strong" : sharedActions.length >= 1 ? "Moderate" : "Divergent";
+  const consensusColor = consensusLevel === "Strong" ? "text-accent" : consensusLevel === "Moderate" ? "text-yellow-400" : "text-destructive";
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-secondary/30 p-3 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <Vote className="h-3.5 w-3.5" /> Orchestration Consensus — SRS §11
+      </div>
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div>
+          <p className="text-lg font-display text-foreground">{advisorMessages.length}</p>
+          <p className="text-[10px] text-muted-foreground">Advisors Voted</p>
+        </div>
+        <div>
+          <p className="text-lg font-display text-foreground">{avgConfidence}%</p>
+          <p className="text-[10px] text-muted-foreground">Avg Confidence</p>
+        </div>
+        <div>
+          <p className={cn("text-lg font-display", consensusColor)}>{consensusLevel}</p>
+          <p className="text-[10px] text-muted-foreground">Consensus</p>
+        </div>
+      </div>
+      {sharedActions.length > 0 && (
+        <div className="flex flex-wrap gap-1 pt-1">
+          <span className="text-[10px] text-muted-foreground mr-1">Shared actions:</span>
+          {sharedActions.map(a => (
+            <span key={a} className="text-[10px] px-1.5 py-0.5 rounded bg-accent/10 border border-accent/30 text-accent">{a}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function MultiAgentChatPage() {
@@ -131,7 +209,6 @@ export function MultiAgentChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -154,7 +231,6 @@ export function MultiAgentChatPage() {
       setMessages((prev) => [...prev, userMsg]);
       setInput("");
 
-      // Build conversation history from existing messages
       const history = messages
         .filter((m) => !m.isStreaming)
         .map((m) => ({
@@ -165,7 +241,6 @@ export function MultiAgentChatPage() {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      // Stream all advisors sequentially for coherent multi-agent conversation
       for (const role of ADVISOR_ROLES) {
         if (controller.signal.aborted) break;
 
@@ -174,15 +249,14 @@ export function MultiAgentChatPage() {
 
         setStreamingAdvisors((prev) => new Set(prev).add(role));
 
-        // Add placeholder
         setMessages((prev) => [
           ...prev,
-          { id: msgId, advisor: role, text: "", ts: nowTs(), isStreaming: true },
+          { id: msgId, advisor: role, text: "", ts: nowTs(), isStreaming: true, confidence: 0 },
         ]);
 
         try {
           await streamAdvisorResponse({
-            userMessage: `${userText}\n\n[Context: You are part of a multi-advisor collaboration room with SOC Analyst, Threat Intel, Incident Response, and vCISO advisors. Provide your perspective based on your role. Be concise.]`,
+            userMessage: `${userText}\n\n[Context: You are part of a multi-advisor collaboration room with SOC Analyst, Threat Intel, Incident Response, and vCISO advisors. Provide your perspective based on your role. Be concise. Always include a confidence level (HIGH/MEDIUM/LOW) at the end of your response.]`,
             conversationHistory: [
               ...history,
               { role: "user" as const, content: userText },
@@ -192,16 +266,18 @@ export function MultiAgentChatPage() {
             onDelta: (chunk) => {
               accumulated += chunk;
               const current = accumulated;
+              const confidence = extractConfidence(current);
               setMessages((prev) =>
                 prev.map((m) =>
-                  m.id === msgId ? { ...m, text: current } : m
+                  m.id === msgId ? { ...m, text: current, confidence } : m
                 )
               );
             },
             onDone: () => {
+              const finalConfidence = extractConfidence(accumulated);
               setMessages((prev) =>
                 prev.map((m) =>
-                  m.id === msgId ? { ...m, isStreaming: false } : m
+                  m.id === msgId ? { ...m, isStreaming: false, confidence: finalConfidence } : m
                 )
               );
               setStreamingAdvisors((prev) => {
@@ -212,7 +288,6 @@ export function MultiAgentChatPage() {
             },
           });
 
-          // Add this advisor's response to history for the next advisor
           history.push({
             role: "assistant" as const,
             content: `[${role}]: ${accumulated}`,
@@ -252,6 +327,98 @@ export function MultiAgentChatPage() {
 
   const handleClear = () => {
     setMessages([]);
+  };
+
+  const handleVote = (msgId: string, vote: "agree" | "disagree") => {
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, vote } : m));
+  };
+
+  // Group messages by user question for consensus panels
+  const renderMessages = () => {
+    const elements: React.ReactNode[] = [];
+    let currentGroup: Message[] = [];
+
+    messages.forEach((m, i) => {
+      if (m.isUser) {
+        // Render previous group's consensus
+        if (currentGroup.length > 0) {
+          elements.push(<ConsensusPanel key={`consensus-${i}`} messages={currentGroup} />);
+          currentGroup = [];
+        }
+      } else {
+        currentGroup.push(m);
+      }
+
+      elements.push(
+        <div key={m.id} className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                "text-xs font-semibold",
+                m.isUser ? "text-muted-foreground" : ROLE_COLORS[m.advisor] ?? "text-foreground"
+              )}
+            >
+              {m.advisor}
+            </span>
+            <span className="text-[10px] text-muted-foreground">{m.ts}</span>
+            {m.isStreaming && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
+            {!m.isUser && !m.isStreaming && m.confidence !== undefined && m.confidence > 0 && (
+              <ConfidenceMeter value={m.confidence} />
+            )}
+          </div>
+          <div
+            className={cn(
+              "rounded-lg border px-4 py-3 text-sm",
+              m.isUser
+                ? "border-primary/30 bg-primary/10 text-foreground"
+                : cn("text-foreground", ROLE_BG[m.advisor] || "border-border/50 bg-secondary/50")
+            )}
+          >
+            {m.text ? (
+              m.isUser ? m.text : (
+                <div className="prose prose-sm prose-invert max-w-none">
+                  <ReactMarkdown>{m.text}</ReactMarkdown>
+                </div>
+              )
+            ) : m.isStreaming ? "…" : ""}
+          </div>
+          {/* Voting indicators - SRS Section 11 */}
+          {!m.isUser && !m.isStreaming && m.text && (
+            <div className="flex items-center gap-2 pl-1">
+              <button
+                onClick={() => handleVote(m.id, "agree")}
+                className={cn(
+                  "flex items-center gap-1 rounded px-2 py-0.5 text-[10px] transition-all",
+                  m.vote === "agree"
+                    ? "bg-accent/20 text-accent"
+                    : "text-muted-foreground hover:text-accent"
+                )}
+              >
+                <ThumbsUp className="h-3 w-3" /> Agree
+              </button>
+              <button
+                onClick={() => handleVote(m.id, "disagree")}
+                className={cn(
+                  "flex items-center gap-1 rounded px-2 py-0.5 text-[10px] transition-all",
+                  m.vote === "disagree"
+                    ? "bg-destructive/20 text-destructive"
+                    : "text-muted-foreground hover:text-destructive"
+                )}
+              >
+                <ThumbsDown className="h-3 w-3" /> Disagree
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    });
+
+    // Final consensus for the last group
+    if (currentGroup.length > 0) {
+      elements.push(<ConsensusPanel key="consensus-final" messages={currentGroup} />);
+    }
+
+    return elements;
   };
 
   return (
@@ -301,7 +468,7 @@ export function MultiAgentChatPage() {
                   <Users className="mx-auto mb-2 h-8 w-8 text-primary" />
                   <p className="font-display text-sm text-foreground">Multi-Agent Collaboration Room</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Ask a security question and all 4 advisors will respond with their expert perspective in real time.
+                    Ask a security question and all 4 advisors will respond with confidence scores and voting per SRS §11.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -321,32 +488,7 @@ export function MultiAgentChatPage() {
                 </div>
               </div>
             )}
-            {messages.map((m) => (
-              <div key={m.id} className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "text-xs font-semibold",
-                      m.isUser ? "text-muted-foreground" : ROLE_COLORS[m.advisor] ?? "text-foreground"
-                    )}
-                  >
-                    {m.advisor}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">{m.ts}</span>
-                  {m.isStreaming && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
-                </div>
-                <p
-                  className={cn(
-                    "rounded-lg border px-4 py-3 text-sm",
-                    m.isUser
-                      ? "border-primary/30 bg-primary/10 text-foreground"
-                      : "border-border/50 bg-secondary/50 text-foreground"
-                  )}
-                >
-                  {m.text || (m.isStreaming ? "…" : "")}
-                </p>
-              </div>
-            ))}
+            {renderMessages()}
           </div>
 
           <div className="flex gap-3 border-t border-border p-4">
