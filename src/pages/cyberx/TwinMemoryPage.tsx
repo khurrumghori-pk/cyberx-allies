@@ -98,7 +98,11 @@ export function TwinMemoryPage() {
   };
 
   const uniqueAdvisorIds = [...new Set(memories.map(m => m.advisor_id))];
-  const filteredMemories = filter === "all" ? memories : memories.filter(m => m.advisor_id === filter);
+  const uniqueTypes = [...new Set(memories.map(m => m.memory_type))];
+  const filteredMemories = memories
+    .filter(m => filter === "all" || m.advisor_id === filter)
+    .filter(m => typeFilter === "all" || m.memory_type === typeFilter)
+    .filter(m => !search || m.content.toLowerCase().includes(search.toLowerCase()));
 
   if (loading) {
     return (
