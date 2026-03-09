@@ -217,29 +217,33 @@ const Index = () => {
       {/* Social Proof */}
       <section className="py-20">
         <div className="mx-auto max-w-5xl px-6">
-          <div className="text-center mb-12 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Trusted by Security Leaders</p>
-            <h2 className="font-display text-3xl text-foreground">What CISOs Are Saying</h2>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-12 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Trusted by Security Leaders</p>
+              <h2 className="font-display text-3xl text-foreground">What CISOs Are Saying</h2>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-6 md:grid-cols-2">
             {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="cyberx-panel p-6 space-y-4">
-                <div className="flex gap-1">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-primary text-primary" />)}
+              <ScrollFadeIn key={i} delay={i * 120}>
+                <div className="cyberx-panel p-6 space-y-4">
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-primary text-primary" />)}
+                  </div>
+                  <p className="text-sm text-foreground italic leading-relaxed">"{t.quote}"</p>
+                  <div className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">{t.author}</span> · {t.company}
+                  </div>
                 </div>
-                <p className="text-sm text-foreground italic leading-relaxed">"{t.quote}"</p>
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">{t.author}</span> · {t.company}
-                </div>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <ScrollFadeIn>
         <div className="mx-auto max-w-3xl px-6">
           <div className="cyberx-panel cyberx-signature-glow p-10 text-center space-y-6">
             <Shield className="h-12 w-12 text-primary mx-auto" />
