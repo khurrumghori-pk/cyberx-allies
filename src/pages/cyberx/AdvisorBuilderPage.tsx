@@ -3,14 +3,13 @@ import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X } from "lucide-react";
+import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-// SRS Section 9: 6-Step Wizard
 const STEPS = [
   { id: 1, label: "Role & Template", icon: Shield },
   { id: 2, label: "Knowledge Upload", icon: BookOpen },
@@ -76,8 +75,12 @@ export function AdvisorBuilderPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [training, setTraining] = useState(false);
+  const [trainingProgress, setTrainingProgress] = useState(0);
+  const [trainingSummary, setTrainingSummary] = useState("");
   const [testQuery, setTestQuery] = useState("How should we respond to a ransomware alert?");
   const [testResponse, setTestResponse] = useState("");
+  const [testLoading, setTestLoading] = useState(false);
   
   const [draft, setDraft] = useState<AdvisorDraft>({
     name: "",
@@ -162,22 +165,77 @@ export function AdvisorBuilderPage() {
   };
 
   const runSimulation = async () => {
-    setTestResponse("Analyzing query...\n");
-    // Simulated response based on role
-    setTimeout(() => {
-      setTestResponse(`**${draft.role} Advisor Response:**\n\nBased on the ${draft.persona_profile.decision_style.toLowerCase()} approach and ${draft.persona_profile.tone.toLowerCase()} communication style:\n\n1. **Immediate Action**: Isolate affected systems via network segmentation\n2. **Investigation**: Correlate with SIEM alerts and EDR telemetry\n3. **Escalation**: Alert Incident Response team per playbook RW-005\n4. **Documentation**: Preserve forensic evidence chain\n\n*Confidence: HIGH* | *Sources: IR-Playbook-RW-005, MITRE T1486*`);
-    }, 1500);
+    setTestLoading(true);
+    setTestResponse("");
+
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/advisor-chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: testQuery }],
+            advisorRole: draft.role,
+          }),
+        }
+      );
+
+      if (!resp.ok || !resp.body) {
+        throw new Error("Simulation failed");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx: number;
+        while ((idx = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              accumulated += content;
+              setTestResponse(accumulated);
+            }
+          } catch { /* partial */ }
+        }
+      }
+    } catch (err: any) {
+      setTestResponse(`⚠ Error: ${err.message}`);
+    } finally {
+      setTestLoading(false);
+    }
   };
 
-  const finalizeAdvisor = async () => {
+  const finalizeAndTrain = async () => {
     if (!user) {
       toast.error("Please sign in to create an advisor");
       return;
     }
 
     setSaving(true);
+    setTrainingProgress(0);
+    setTrainingSummary("");
+
     try {
-      const { error } = await supabase.from("advisors").insert({
+      // Step 1: Create the advisor
+      const { data: advisor, error } = await supabase.from("advisors").insert({
         tenant_id: user.id,
         name: draft.name,
         role: draft.role,
@@ -188,16 +246,58 @@ export function AdvisorBuilderPage() {
         prompt_dna: draft.prompt_dna,
         access_roles: draft.access_roles,
         telemetry_enabled: draft.telemetry_enabled,
-        state: "active",
+        state: "training",
         created_by: user.id,
-      });
+      }).select().single();
 
       if (error) throw error;
 
-      toast.success(`${draft.name} is now active!`);
-      navigate("/advisors/dashboard");
+      toast.success(`${draft.name} created! Starting training…`);
+      setTraining(true);
+      setSaving(false);
+
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setTrainingProgress(prev => {
+          if (prev >= 90) return prev;
+          return prev + Math.random() * 15;
+        });
+      }, 500);
+
+      // Step 2: Train with knowledge sources
+      const trainResp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/advisor-train`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            advisorId: advisor.id,
+            knowledgeSources: draft.knowledge_refs,
+          }),
+        }
+      );
+
+      clearInterval(progressInterval);
+
+      if (!trainResp.ok) {
+        const errData = await trainResp.json().catch(() => ({}));
+        throw new Error(errData.error || "Training failed");
+      }
+
+      const trainData = await trainResp.json();
+      setTrainingProgress(100);
+      setTrainingSummary(trainData.knowledgeSummary || "Knowledge indexed successfully.");
+
+      toast.success(`${draft.name} training complete!`);
+
+      // Redirect after short delay
+      setTimeout(() => navigate("/advisors/dashboard"), 2500);
     } catch (err: any) {
       toast.error(err.message || "Failed to create advisor");
+      setTraining(false);
     } finally {
       setSaving(false);
     }
@@ -216,7 +316,7 @@ export function AdvisorBuilderPage() {
 
   return (
     <CyberXLayout title="Advisor Creation Wizard" breadcrumb={["CyberX", "Builder"]}>
-      {/* Step progress - SRS Section 9 */}
+      {/* Step progress */}
       <div className="cyberx-panel p-4 overflow-x-auto">
         <div className="flex items-center gap-0 min-w-max">
           {STEPS.map((s, i) => (
@@ -273,7 +373,7 @@ export function AdvisorBuilderPage() {
           </div>
         )}
 
-        {/* Step 2: Knowledge Upload - SRS Section 9 */}
+        {/* Step 2: Knowledge Upload */}
         {step === 2 && (
           <div className="space-y-4">
             <div>
@@ -318,7 +418,7 @@ export function AdvisorBuilderPage() {
           </div>
         )}
 
-        {/* Step 3: Persona & Tone Configuration - SRS Section 10 */}
+        {/* Step 3: Persona & Tone Configuration */}
         {step === 3 && (
           <div className="space-y-6">
             <div>
@@ -439,7 +539,7 @@ export function AdvisorBuilderPage() {
           </div>
         )}
 
-        {/* Step 4: Access & Security - SRS Section 9 */}
+        {/* Step 4: Access & Security */}
         {step === 4 && (
           <div className="space-y-4">
             <div>
@@ -496,12 +596,12 @@ export function AdvisorBuilderPage() {
           </div>
         )}
 
-        {/* Step 5: Review & Validate - SRS Section 9 */}
+        {/* Step 5: Review & Validate with Live AI Simulation */}
         {step === 5 && (
           <div className="space-y-4">
             <div>
               <h2 className="font-display text-lg">Review & Validate</h2>
-              <p className="text-sm text-muted-foreground mt-1">Review settings and run a test simulation</p>
+              <p className="text-sm text-muted-foreground mt-1">Review settings and run a live AI test simulation</p>
             </div>
             
             <div className="grid gap-4 lg:grid-cols-2">
@@ -531,18 +631,21 @@ export function AdvisorBuilderPage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">Test Query</label>
+                  <label className="text-xs font-medium text-muted-foreground">Test Query (Live AI Simulation)</label>
                   <Textarea
                     value={testQuery}
                     onChange={(e) => setTestQuery(e.target.value)}
                     className="bg-secondary/60 border-border/80"
                   />
-                  <Button variant="neon" size="sm" onClick={runSimulation}>Run Simulation</Button>
+                  <Button variant="neon" size="sm" onClick={runSimulation} disabled={testLoading}>
+                    {testLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Sparkles className="h-3.5 w-3.5 mr-1" />}
+                    {testLoading ? "Running…" : "Run Live Simulation"}
+                  </Button>
                 </div>
 
                 {testResponse && (
-                  <div className="cyberx-panel border-accent/30 p-4 space-y-2">
-                    <p className="cyberx-pill text-[10px]">Simulation Response</p>
+                  <div className="cyberx-panel border-accent/30 p-4 space-y-2 max-h-64 overflow-y-auto">
+                    <p className="cyberx-pill text-[10px]">Live AI Response</p>
                     <div className="text-sm text-foreground whitespace-pre-wrap">{testResponse}</div>
                   </div>
                 )}
@@ -551,17 +654,21 @@ export function AdvisorBuilderPage() {
           </div>
         )}
 
-        {/* Step 6: Finalize & Train - SRS Section 9 */}
+        {/* Step 6: Finalize & Train with Knowledge Sources */}
         {step === 6 && (
           <div className="space-y-4">
             <div>
-              <h2 className="font-display text-lg">Finalize & Activate</h2>
-              <p className="text-sm text-muted-foreground mt-1">Your advisor is ready to be activated</p>
+              <h2 className="font-display text-lg">Finalize & Train</h2>
+              <p className="text-sm text-muted-foreground mt-1">Your advisor will be created and trained with selected knowledge sources</p>
             </div>
 
             <div className="cyberx-panel border-primary/30 p-6 text-center space-y-4">
               <div className="h-16 w-16 mx-auto rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-                <Shield className="h-8 w-8 text-primary" />
+                {training ? (
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                ) : (
+                  <Shield className="h-8 w-8 text-primary" />
+                )}
               </div>
               <div>
                 <h3 className="font-display text-xl text-foreground">{draft.name || `${draft.role} Advisor`}</h3>
@@ -572,16 +679,59 @@ export function AdvisorBuilderPage() {
                 <span className="cyberx-pill border-accent/40 text-accent">{draft.persona_profile.tone}</span>
                 <span className="cyberx-pill border-primary/40 text-primary">{draft.persona_profile.decision_style}</span>
               </div>
-              <Button variant="hero" size="lg" onClick={finalizeAdvisor} disabled={saving} className="mt-4">
-                {saving ? "Activating..." : "Activate Advisor"}
-              </Button>
+
+              {/* Training progress */}
+              {training && (
+                <div className="space-y-3 pt-4">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Training knowledge sources…</span>
+                    <span className="font-mono text-primary">{Math.round(trainingProgress)}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-300"
+                      style={{ width: `${trainingProgress}%` }}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {draft.knowledge_refs.map(k => {
+                      const src = KNOWLEDGE_SOURCES.find(s => s.id === k);
+                      return (
+                        <span key={k} className="text-[10px] px-2 py-0.5 rounded bg-secondary border border-border text-muted-foreground">
+                          {src?.label || k}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  {trainingSummary && (
+                    <div className="mt-3 p-3 rounded-lg bg-accent/10 border border-accent/30 text-left">
+                      <p className="text-[10px] font-semibold text-accent mb-1">Knowledge Index Summary</p>
+                      <p className="text-xs text-muted-foreground">{trainingSummary}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!training && (
+                <Button variant="hero" size="lg" onClick={finalizeAndTrain} disabled={saving} className="mt-4">
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" /> Creating…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" /> Activate & Train Advisor
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         )}
 
         {/* Navigation */}
         <div className="flex justify-between pt-4 border-t border-border/40">
-          <Button variant="outline" onClick={() => setStep((p) => Math.max(1, p - 1))} disabled={step === 1}>
+          <Button variant="outline" onClick={() => setStep((p) => Math.max(1, p - 1))} disabled={step === 1 || training}>
             Back
           </Button>
           {step < 6 && (

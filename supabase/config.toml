@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.team-twin-chat]
 verify_jwt = false
+
+[functions.advisor-train]
+verify_jwt = false
+
+[functions.generate-notification]
+verify_jwt = false
