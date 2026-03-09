@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Activity, ChevronRight, ChevronLeft, CheckCircle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 interface PsychoQuestion {
   id: number;
@@ -84,6 +85,16 @@ export function PsychometricTestPage() {
     }));
   };
 
+  const applyToAdvisor = () => {
+    const scores = calculateTraitScores();
+    const psychoData = {
+      traits: scores.map((s) => ({ trait: s.trait, label: s.label, score: s.score, description: s.description })),
+    };
+    localStorage.setItem("cyberx_psychometric_result", JSON.stringify(psychoData));
+    toast.success("Psychometric profile saved — returning to builder");
+    navigate("/advisors/builder");
+  };
+
   return (
     <CyberXLayout title="Psychometric Assessment" breadcrumb={["CyberX", "Builder", "Psychometric Test"]}>
       <Button variant="ghost" size="sm" onClick={() => navigate("/advisors/builder")} className="mb-4 gap-2">
@@ -104,7 +115,6 @@ export function PsychometricTestPage() {
 
           <Progress value={progress} className="h-1.5" />
 
-          {/* Question */}
           <div className="space-y-5 pt-2">
             <div className="flex items-start gap-3">
               <div className="h-8 w-8 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center shrink-0 mt-0.5">
@@ -116,7 +126,6 @@ export function PsychometricTestPage() {
               </div>
             </div>
 
-            {/* Likert scale */}
             <div className="flex justify-between gap-2">
               {LIKERT_LABELS.map((l) => (
                 <button
@@ -141,7 +150,6 @@ export function PsychometricTestPage() {
             </div>
           </div>
 
-          {/* Nav */}
           <div className="flex items-center justify-between pt-4 border-t border-border/40">
             <Button variant="ghost" size="sm" onClick={() => setCurrentQ((c) => Math.max(0, c - 1))} disabled={currentQ === 0}>
               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
@@ -172,7 +180,6 @@ export function PsychometricTestPage() {
           </div>
         </div>
       ) : (
-        /* Results */
         <div className="cyberx-panel p-6 space-y-6">
           <div className="text-center">
             <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-accent/20 border border-accent/40 mx-auto mb-3">
@@ -201,7 +208,7 @@ export function PsychometricTestPage() {
           </div>
 
           <div className="flex justify-center gap-3 pt-4 border-t border-border/40">
-            <Button variant="hero" onClick={() => navigate("/advisors/builder")}>
+            <Button variant="hero" onClick={applyToAdvisor}>
               Apply to Advisor <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
             <Button variant="outline" onClick={() => { setShowResults(false); setAnswers({}); setCurrentQ(0); }}>

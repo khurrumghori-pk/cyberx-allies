@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Brain, ChevronRight, ChevronLeft, CheckCircle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 const MBTI_QUESTIONS = [
   {
@@ -117,19 +118,44 @@ export function MBTITestPage() {
     }
   };
 
-  const calculateResult = () => {
+  const calculateScores = () => {
     const scores: Record<string, number> = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
     MBTI_QUESTIONS.forEach((q, i) => {
       const a = answers[i];
       if (a === "A") scores[q.labelA]++;
       else if (a === "B") scores[q.labelB]++;
     });
+    return scores;
+  };
+
+  const calculateResult = () => {
+    const scores = calculateScores();
     const type =
       (scores.E >= scores.I ? "E" : "I") +
       (scores.S >= scores.N ? "S" : "N") +
       (scores.T >= scores.F ? "T" : "F") +
       (scores.J >= scores.P ? "J" : "P");
     setResult(type);
+  };
+
+  const applyToAdvisor = () => {
+    if (!result) return;
+    const scores = calculateScores();
+    const dimensions = [
+      { axis: "E/I", label: result[0] === "E" ? "Extraversion" : "Introversion", value: Math.round((Math.max(scores.E, scores.I) / 2) * 100) },
+      { axis: "S/N", label: result[1] === "S" ? "Sensing" : "Intuition", value: Math.round((Math.max(scores.S, scores.N) / 2) * 100) },
+      { axis: "T/F", label: result[2] === "T" ? "Thinking" : "Feeling", value: Math.round((Math.max(scores.T, scores.F) / 2) * 100) },
+      { axis: "J/P", label: result[3] === "J" ? "Judging" : "Perceiving", value: Math.round((Math.max(scores.J, scores.P) / 2) * 100) },
+    ];
+    const mbtiData = {
+      type: result,
+      label: MBTI_DESCRIPTIONS[result]?.split("—")[0]?.trim() || result,
+      description: MBTI_DESCRIPTIONS[result] || "",
+      dimensions,
+    };
+    localStorage.setItem("cyberx_mbti_result", JSON.stringify(mbtiData));
+    toast.success("MBTI result saved — returning to builder");
+    navigate("/advisors/builder");
   };
 
   const allAnswered = Object.keys(answers).length === MBTI_QUESTIONS.length;
@@ -157,7 +183,6 @@ export function MBTITestPage() {
 
           <Progress value={progress} className="h-1.5" />
 
-          {/* Question */}
           <div className="space-y-4 pt-2">
             <div className="flex items-start gap-3">
               <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 mt-0.5">
@@ -194,7 +219,6 @@ export function MBTITestPage() {
             </div>
           </div>
 
-          {/* Navigation */}
           <div className="flex items-center justify-between pt-4 border-t border-border/40">
             <Button
               variant="ghost"
@@ -235,7 +259,6 @@ export function MBTITestPage() {
           </div>
         </div>
       ) : (
-        /* Result */
         <div className="cyberx-panel cyberx-signature-glow p-8 text-center space-y-6">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/20 border border-primary/40 mx-auto">
             <Brain className="h-8 w-8 text-primary" />
@@ -260,7 +283,7 @@ export function MBTITestPage() {
           </div>
 
           <div className="flex justify-center gap-3 pt-4">
-            <Button variant="hero" onClick={() => navigate("/advisors/builder")}>
+            <Button variant="hero" onClick={applyToAdvisor}>
               Apply to Advisor <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
             <Button variant="outline" onClick={() => { setResult(null); setAnswers({}); setCurrentQ(0); }}>
