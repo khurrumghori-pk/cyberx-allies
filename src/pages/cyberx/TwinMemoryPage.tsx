@@ -3,9 +3,12 @@ import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search } from "lucide-react";
+import { Brain, Trash2, Loader2, Bot, Calendar, Tag, Search, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Memory {
   id: string;
@@ -36,6 +39,9 @@ export function TwinMemoryPage() {
   const [filter, setFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newMemory, setNewMemory] = useState({ advisorId: "", type: "fact", content: "" });
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -77,6 +83,28 @@ export function TwinMemoryPage() {
     }
   };
 
+  const addMemory = async () => {
+    if (!newMemory.advisorId || !newMemory.content.trim()) {
+      toast.error("Please select a twin and enter memory content");
+      return;
+    }
+    setAdding(true);
+    const { data, error } = await supabase.from("twin_memories").insert({
+      advisor_id: newMemory.advisorId,
+      memory_type: newMemory.type,
+      content: newMemory.content.trim(),
+    }).select().single();
+    if (error) {
+      toast.error("Failed to add memory");
+    } else {
+      setMemories(prev => [data, ...prev]);
+      setNewMemory({ advisorId: "", type: "fact", content: "" });
+      setAddDialogOpen(false);
+      toast.success("Memory added to Digital Twin");
+    }
+    setAdding(false);
+  };
+
   const getAdvisorName = (advisorId: string) => {
     const a = advisors.find(a => a.id === advisorId);
     return a ? a.name : "Unknown";
@@ -114,6 +142,69 @@ export function TwinMemoryPage() {
 
   return (
     <CyberXLayout title="Twin Memory" breadcrumb={["CyberX", "Twin Memory"]}>
+      {/* Header with Add Button */}
+      <div className="flex items-center justify-between">
+        <div />
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="hero" size="sm">
+              <Plus className="h-4 w-4" /> Add Memory
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-background border-border">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-foreground">
+                <Brain className="h-5 w-5 text-primary" /> Teach Your Digital Twin
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Select Twin</label>
+                <Select value={newMemory.advisorId} onValueChange={v => setNewMemory(p => ({ ...p, advisorId: v }))}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue placeholder="Choose a Digital Twin…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {advisors.map(a => (
+                      <SelectItem key={a.id} value={a.id}>{a.name} — {a.role}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Memory Type</label>
+                <Select value={newMemory.type} onValueChange={v => setNewMemory(p => ({ ...p, type: v }))}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fact">Fact</SelectItem>
+                    <SelectItem value="preference">Preference</SelectItem>
+                    <SelectItem value="conversation_pattern">Conversation Pattern</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Memory Content</label>
+                <Textarea
+                  value={newMemory.content}
+                  onChange={e => setNewMemory(p => ({ ...p, content: e.target.value }))}
+                  placeholder="e.g., 'I prefer concise bullet-point responses' or 'Our primary SIEM is Splunk Enterprise'"
+                  className="bg-secondary border-border min-h-[100px]"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="ghost" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+                <Button variant="hero" onClick={addMemory} disabled={adding}>
+                  {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Add Memory
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="cyberx-kpi space-y-1">

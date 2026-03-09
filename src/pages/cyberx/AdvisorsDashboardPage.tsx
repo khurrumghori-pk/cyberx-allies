@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { AdvisorCard } from "@/components/cyberx/AdvisorCard";
 import { ADVISORS } from "@/data/cyberx-advisors";
@@ -6,6 +7,8 @@ import { PersonalitySummaryCard } from "@/components/cyberx/PersonalitySummaryCa
 import { MyDigitalTwinCard } from "@/components/cyberx/MyDigitalTwinCard";
 import { Activity, ShieldAlert, Cpu, TrendingUp } from "lucide-react";
 import heroBanner from "@/assets/cyberx-hero-banner.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; sub: string; icon: React.FC<{ className?: string }> }) => (
   <div className="cyberx-kpi space-y-2">
@@ -19,6 +22,46 @@ const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; 
 );
 
 export function AdvisorsDashboardPage() {
+  const { user } = useAuth();
+  const [memoryCounts, setMemoryCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch memory counts grouped by advisor role
+    const fetchMemoryCounts = async () => {
+      const { data: advisors } = await supabase
+        .from("advisors")
+        .select("id, role")
+        .or(`assigned_user_id.eq.${user.id},tenant_id.eq.${user.id}`);
+      
+      if (!advisors?.length) return;
+      
+      const { data: memories } = await supabase
+        .from("twin_memories")
+        .select("advisor_id");
+      
+      if (!memories) return;
+      
+      // Map advisor IDs to their roles, then count memories per role
+      const idToRole: Record<string, string> = {};
+      advisors.forEach(a => { idToRole[a.id] = a.role; });
+      
+      const counts: Record<string, number> = {};
+      memories.forEach(m => {
+        const role = idToRole[m.advisor_id];
+        if (role) {
+          // Map DB role to static advisor id
+          const staticId = ADVISORS.find(a => a.role === role)?.id;
+          if (staticId) {
+            counts[staticId] = (counts[staticId] || 0) + 1;
+          }
+        }
+      });
+      setMemoryCounts(counts);
+    };
+    fetchMemoryCounts();
+  }, [user]);
+
   return (
     <CyberXLayout title="Advisors Dashboard" breadcrumb={["CyberX", "Dashboard"]}>
       {/* Hero Banner */}
@@ -61,7 +104,7 @@ export function AdvisorsDashboardPage() {
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">Your Advisor Panel</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ADVISORS.map((a) => (
-            <AdvisorCard key={a.id} advisor={a} />
+            <AdvisorCard key={a.id} advisor={a} memoryCount={memoryCounts[a.id] || 0} />
           ))}
         </div>
       </div>
