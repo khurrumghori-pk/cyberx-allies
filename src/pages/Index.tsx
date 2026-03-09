@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HeroDemoWalkthrough from "@/components/cyberx/HeroDemoWalkthrough";
+import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 
 const METRICS = [
   { value: "6", label: "AI Advisors", sub: "Active digital twins" },
