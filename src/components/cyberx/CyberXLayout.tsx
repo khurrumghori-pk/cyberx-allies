@@ -1,13 +1,12 @@
-import { Link, useLocation } from "react-router-dom";
-import { ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ReactNode, useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, MessageSquare, Bot, Users, Brain,
   ShoppingBag, BarChart2, PlugZap, Shield, Bell,
-  ChevronRight, Menu, X, ExternalLink
+  ChevronRight, Menu, X, ExternalLink, LogOut, User
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavItem {
   label: string;
