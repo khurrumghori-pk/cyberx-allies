@@ -101,6 +101,11 @@ const App = () => (
                 <AdminTwinAssignmentPage />
               </ProtectedRoute>
             } />
+            <Route path="/advisors/twin-memory" element={
+              <ProtectedRoute>
+                <TwinMemoryPage />
+              </ProtectedRoute>
+            } />
             <Route path="/install" element={<InstallPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
