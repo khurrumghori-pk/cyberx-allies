@@ -275,6 +275,7 @@ export function MultiAgentChatPage() {
 
         try {
           await streamAdvisorResponse({
+            advisorId: advisorIdMap[role],
             userMessage: `${userText}\n\n[Context: You are part of a multi-advisor collaboration room with SOC Analyst, Threat Intel, Incident Response, and vCISO advisors. Provide your perspective based on your role. Be concise. Always include a confidence level (HIGH/MEDIUM/LOW) at the end of your response.]`,
             conversationHistory: [
               ...history,
