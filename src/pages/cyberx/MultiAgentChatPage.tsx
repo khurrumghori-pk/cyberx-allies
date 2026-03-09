@@ -206,12 +206,27 @@ function ConsensusPanel({ messages }: { messages: Message[] }) {
 }
 
 export function MultiAgentChatPage() {
+  const { user } = useAuth();
   const active = ADVISORS.slice(0, 4);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streamingAdvisors, setStreamingAdvisors] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [advisorIdMap, setAdvisorIdMap] = useState<Record<string, string>>({});
+
+  // Fetch advisor IDs for passive learning
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("advisors").select("id, role").or(`assigned_user_id.eq.${user.id},tenant_id.eq.${user.id}`)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach(a => { map[a.role] = a.id; });
+          setAdvisorIdMap(map);
+        }
+      });
+  }, [user]);
 
   useEffect(() => {
     if (scrollRef.current) {
