@@ -1,7 +1,9 @@
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { AdvisorCard } from "@/components/cyberx/AdvisorCard";
 import { ADVISORS } from "@/data/cyberx-advisors";
+import { ThreatRadarChart } from "@/components/cyberx/ThreatRadarChart";
 import { Activity, ShieldAlert, Cpu, TrendingUp } from "lucide-react";
+import heroBanner from "@/assets/cyberx-hero-banner.jpg";
 
 const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; sub: string; icon: React.FC<{ className?: string }> }) => (
   <div className="cyberx-kpi space-y-2">
@@ -17,6 +19,24 @@ const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; 
 export function AdvisorsDashboardPage() {
   return (
     <CyberXLayout title="Advisors Dashboard" breadcrumb={["CyberX", "Dashboard"]}>
+      {/* Hero Banner */}
+      <div className="relative rounded-xl overflow-hidden mb-6 h-48">
+        <img
+          src={heroBanner}
+          alt="CyberX Command Center"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
+        <div className="absolute inset-0 flex items-center p-6">
+          <div>
+            <h1 className="font-display text-2xl text-foreground mb-2">CyberX Command Center</h1>
+            <p className="text-sm text-muted-foreground max-w-md">
+              AI-powered security advisors working 24/7 to protect your organization
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KPI label="Active Advisors" value="7" sub="+2 this week" icon={Cpu} />
@@ -24,6 +44,9 @@ export function AdvisorsDashboardPage() {
         <KPI label="Open Threats" value="14" sub="3 critical" icon={ShieldAlert} />
         <KPI label="Recommendations" value="29" sub="Actioned: 21 (72%)" icon={TrendingUp} />
       </div>
+
+      {/* Threat Radar Chart */}
+      <ThreatRadarChart />
 
       {/* Advisor cards */}
       <div>
