@@ -320,6 +320,38 @@ export type Database = {
         }
         Relationships: []
       }
+      twin_memories: {
+        Row: {
+          advisor_id: string
+          content: string
+          created_at: string
+          id: string
+          memory_type: string
+        }
+        Insert: {
+          advisor_id: string
+          content: string
+          created_at?: string
+          id?: string
+          memory_type: string
+        }
+        Update: {
+          advisor_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          memory_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_memories_advisor_id_fkey"
+            columns: ["advisor_id"]
+            isOneToOne: false
+            referencedRelation: "advisors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

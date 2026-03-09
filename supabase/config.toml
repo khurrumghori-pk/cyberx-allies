@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.generate-notification]
 verify_jwt = false
+
+[functions.process-twin-learning]
+verify_jwt = false
+
+[functions.generate-proactive-brief]
+verify_jwt = false
