@@ -236,6 +236,56 @@ export type Database = {
           },
         ]
       }
+      compliance_assessments: {
+        Row: {
+          assessed_at: string
+          assessed_by: string
+          control_name: string
+          control_ref: string
+          evidence: string | null
+          framework: string
+          id: string
+          next_review: string | null
+          notes: string | null
+          policy_id: string | null
+          status: string
+        }
+        Insert: {
+          assessed_at?: string
+          assessed_by: string
+          control_name: string
+          control_ref: string
+          evidence?: string | null
+          framework: string
+          id?: string
+          next_review?: string | null
+          notes?: string | null
+          policy_id?: string | null
+          status?: string
+        }
+        Update: {
+          assessed_at?: string
+          assessed_by?: string
+          control_name?: string
+          control_ref?: string
+          evidence?: string | null
+          framework?: string
+          id?: string
+          next_review?: string | null
+          notes?: string | null
+          policy_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_assessments_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "org_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           advisor: string
@@ -271,6 +321,107 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      org_policies: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          category: string
+          created_at: string
+          created_by: string
+          description: string | null
+          effective_date: string | null
+          file_name: string | null
+          file_url: string | null
+          frameworks: string[] | null
+          id: string
+          review_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          effective_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          frameworks?: string[] | null
+          id?: string
+          review_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          effective_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          frameworks?: string[] | null
+          id?: string
+          review_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      policy_updates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          new_version: string | null
+          policy_id: string
+          previous_version: string | null
+          title: string
+          update_type: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          new_version?: string | null
+          policy_id: string
+          previous_version?: string | null
+          title: string
+          update_type?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          new_version?: string | null
+          policy_id?: string
+          previous_version?: string | null
+          title?: string
+          update_type?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_updates_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "org_policies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
