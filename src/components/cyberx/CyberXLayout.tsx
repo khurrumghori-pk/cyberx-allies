@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { label: "Advisor Builder", href: "/advisors/builder", icon: Bot },
   { label: "Team Digital Twin", href: "/advisors/team-twin", icon: Users },
   { label: "Twin Management", href: "/advisors/twin-admin", icon: UserCog },
+  { label: "Twin Memory", href: "/advisors/twin-memory", icon: Brain },
   { label: "Cyber Memory", href: "/advisors/memory", icon: Brain },
   { label: "Marketplace", href: "/advisors/marketplace", icon: ShoppingBag },
   { label: "Analytics", href: "/advisors/analytics", icon: BarChart2 },
