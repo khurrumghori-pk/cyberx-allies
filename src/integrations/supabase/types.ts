@@ -195,6 +195,47 @@ export type Database = {
         }
         Relationships: []
       }
+      colleagues: {
+        Row: {
+          advisor_id: string | null
+          created_at: string | null
+          department: string | null
+          display_name: string
+          id: string
+          is_former_employee: boolean | null
+          job_title: string | null
+          tenant_id: string
+        }
+        Insert: {
+          advisor_id?: string | null
+          created_at?: string | null
+          department?: string | null
+          display_name: string
+          id?: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
+          tenant_id: string
+        }
+        Update: {
+          advisor_id?: string | null
+          created_at?: string | null
+          department?: string | null
+          display_name?: string
+          id?: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colleagues_advisor_id_fkey"
+            columns: ["advisor_id"]
+            isOneToOne: false
+            referencedRelation: "advisors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           advisor: string
@@ -235,28 +276,73 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          department: string | null
           display_name: string | null
           id: string
+          is_former_employee: boolean | null
+          job_title: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           id: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           id?: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
           updated_at?: string
           username?: string | null
         }
         Relationships: []
+      }
+      team_colleagues: {
+        Row: {
+          colleague_id: string
+          id: string
+          role: string | null
+          team_id: string
+        }
+        Insert: {
+          colleague_id: string
+          id?: string
+          role?: string | null
+          team_id: string
+        }
+        Update: {
+          colleague_id?: string
+          id?: string
+          role?: string | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_colleagues_colleague_id_fkey"
+            columns: ["colleague_id"]
+            isOneToOne: false
+            referencedRelation: "colleagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_colleagues_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       team_members: {
         Row: {
