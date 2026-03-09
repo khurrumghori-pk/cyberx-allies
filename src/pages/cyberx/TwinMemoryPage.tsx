@@ -39,6 +39,9 @@ export function TwinMemoryPage() {
   const [filter, setFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newMemory, setNewMemory] = useState({ advisorId: "", type: "fact", content: "" });
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (!user) return;
