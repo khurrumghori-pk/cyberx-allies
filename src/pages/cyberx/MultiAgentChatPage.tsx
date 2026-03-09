@@ -60,6 +60,7 @@ async function streamAdvisorResponse({
   userMessage,
   conversationHistory,
   advisorRole,
+  advisorId,
   onDelta,
   onDone,
   signal,
@@ -67,6 +68,7 @@ async function streamAdvisorResponse({
   userMessage: string;
   conversationHistory: { role: "user" | "assistant"; content: string }[];
   advisorRole: string;
+  advisorId?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   signal?: AbortSignal;
@@ -82,7 +84,7 @@ async function streamAdvisorResponse({
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages, advisorRole }),
+    body: JSON.stringify({ messages, advisorRole, advisorId }),
     signal,
   });
 
