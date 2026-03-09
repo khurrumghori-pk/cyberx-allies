@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, mode, targetAdvisorId, targetUserName, teamName, teamMembers } = await req.json();
+    const { message, mode, targetAdvisorId, targetUserName, teamName, teamMembers, context, conversationHistory } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -41,9 +41,10 @@ serve(async (req) => {
     }
 
     if (mode === "twin") {
+      const extraContext = context ? `\n\nAdditional Context: ${context}` : "";
       systemPrompt = `You are the Digital Twin of ${targetUserName || "a team member"}. You represent their knowledge, expertise, communication style, and institutional memory.
       
-${memoryContext}
+${memoryContext}${extraContext}
 
 When responding as this person's Digital Twin:
 1. Answer as if you ARE this person, using "I" perspective
@@ -86,6 +87,7 @@ One question → the whole team's answer.`;
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
+          ...(conversationHistory || []).map((m: any) => ({ role: m.role, content: m.content })),
           { role: "user", content: message },
         ],
         stream: true,
