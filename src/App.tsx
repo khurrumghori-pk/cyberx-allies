@@ -107,6 +107,11 @@ const App = () => (
                 <TwinMemoryPage />
               </ProtectedRoute>
             } />
+            <Route path="/advisors/org-chart" element={
+              <ProtectedRoute>
+                <OrgChartPage />
+              </ProtectedRoute>
+            } />
             <Route path="/install" element={<InstallPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
