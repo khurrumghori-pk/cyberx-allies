@@ -159,23 +159,27 @@ const Index = () => {
       {/* Features */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Platform Capabilities</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground">
-              Enterprise Security, Reimagined with AI
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Every feature built to SRS specification — from multi-agent orchestration to zero trust governance.
-            </p>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-16 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Platform Capabilities</p>
+              <h2 className="font-display text-3xl md:text-4xl text-foreground">
+                Enterprise Security, Reimagined with AI
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Every feature built to SRS specification — from multi-agent orchestration to zero trust governance.
+              </p>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title} className={cn("rounded-2xl border p-6 space-y-3 transition-all hover:scale-[1.02]", f.bg)}>
-                <f.icon className={cn("h-8 w-8", f.color)} />
-                <h3 className="font-display text-lg text-foreground">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </div>
+            {FEATURES.map((f, i) => (
+              <ScrollFadeIn key={f.title} delay={i * 80}>
+                <div className={cn("rounded-2xl border p-6 space-y-3 transition-all hover:scale-[1.02] h-full", f.bg)}>
+                  <f.icon className={cn("h-8 w-8", f.color)} />
+                  <h3 className="font-display text-lg text-foreground">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
