@@ -106,7 +106,8 @@ function UserDropdown() {
   );
 }
 
-  export function CyberXLayout({ children, title, breadcrumb }: CyberXLayoutProps) {
+export function CyberXLayout({ children, title, breadcrumb }: CyberXLayoutProps) {
+  const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
