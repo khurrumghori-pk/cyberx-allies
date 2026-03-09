@@ -33,7 +33,79 @@ interface CyberXLayoutProps {
   breadcrumb?: string[];
 }
 
-export function CyberXLayout({ children, title, breadcrumb }: CyberXLayoutProps) {
+const ROLE_LABELS: Record<string, string> = {
+  admin: "Admin",
+  vciso: "vCISO",
+  soc_analyst: "SOC Analyst",
+};
+
+const ROLE_COLORS: Record<string, string> = {
+  admin: "bg-destructive/20 text-destructive border-destructive/40",
+  vciso: "bg-[hsl(267_90%_66%/0.2)] text-[hsl(267_90%_66%)] border-[hsl(267_90%_66%/0.4)]",
+  soc_analyst: "bg-primary/20 text-primary border-primary/40",
+};
+
+function UserDropdown() {
+  const { user, role, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const initials = user?.email?.slice(0, 2).toUpperCase() ?? "??";
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="h-8 w-8 rounded-full border border-border bg-secondary/80 flex items-center justify-center text-xs font-semibold text-foreground hover:border-primary transition-colors"
+      >
+        {initials}
+      </button>
+      {open && (
+        <div className="absolute right-0 top-10 z-50 w-64 rounded-xl border border-border/80 bg-popover/95 backdrop-blur-lg p-3 shadow-xl space-y-3">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <div className="h-9 w-9 rounded-full bg-secondary border border-border flex items-center justify-center text-xs font-semibold">
+                {initials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground truncate">{user?.user_metadata?.display_name || user?.email}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+              </div>
+            </div>
+            {role && (
+              <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold", ROLE_COLORS[role] ?? "bg-secondary text-foreground border-border")}>
+                {ROLE_LABELS[role] ?? role}
+              </span>
+            )}
+          </div>
+          <div className="border-t border-border/40" />
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
