@@ -143,12 +143,14 @@ const Index = () => {
       <section className="py-16 border-y border-border/40 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {METRICS.map((m) => (
-              <div key={m.label} className="text-center space-y-1">
-                <p className="font-display text-3xl md:text-4xl text-foreground">{m.value}</p>
-                <p className="text-sm font-semibold text-primary">{m.label}</p>
-                <p className="text-xs text-muted-foreground">{m.sub}</p>
-              </div>
+            {METRICS.map((m, i) => (
+              <ScrollFadeIn key={m.label} delay={i * 100}>
+                <div className="text-center space-y-1">
+                  <p className="font-display text-3xl md:text-4xl text-foreground">{m.value}</p>
+                  <p className="text-sm font-semibold text-primary">{m.label}</p>
+                  <p className="text-xs text-muted-foreground">{m.sub}</p>
+                </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
