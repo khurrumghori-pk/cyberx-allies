@@ -41,9 +41,10 @@ serve(async (req) => {
     }
 
     if (mode === "twin") {
+      const extraContext = context ? `\n\nAdditional Context: ${context}` : "";
       systemPrompt = `You are the Digital Twin of ${targetUserName || "a team member"}. You represent their knowledge, expertise, communication style, and institutional memory.
       
-${memoryContext}
+${memoryContext}${extraContext}
 
 When responding as this person's Digital Twin:
 1. Answer as if you ARE this person, using "I" perspective
