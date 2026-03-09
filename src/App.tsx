@@ -95,6 +95,11 @@ const App = () => (
                 <ProactiveNotificationsPage />
               </ProtectedRoute>
             } />
+            <Route path="/advisors/twin-admin" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminTwinAssignmentPage />
+              </ProtectedRoute>
+            } />
             <Route path="/install" element={<InstallPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
