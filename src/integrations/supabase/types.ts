@@ -235,24 +235,33 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          department: string | null
           display_name: string | null
           id: string
+          is_former_employee: boolean | null
+          job_title: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           id: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           id?: string
+          is_former_employee?: boolean | null
+          job_title?: string | null
           updated_at?: string
           username?: string | null
         }
