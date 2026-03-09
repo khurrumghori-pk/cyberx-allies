@@ -29,7 +29,7 @@ interface AdvisorCardProps {
   memoryCount?: number;
 }
 
-export function AdvisorCard({ advisor }: AdvisorCardProps) {
+export function AdvisorCard({ advisor, memoryCount = 0 }: AdvisorCardProps) {
   return (
     <div
       className="cyberx-panel group relative overflow-hidden p-5 space-y-4 hover:border-primary/40 transition-all duration-200 cursor-pointer"
@@ -42,7 +42,14 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       />
 
       <div className="flex items-start gap-3">
-        <AdvisorAvatar advisor={advisor} size="lg" />
+        <div className="relative">
+          <AdvisorAvatar advisor={advisor} size="lg" />
+          {memoryCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground px-1">
+              {memoryCount > 99 ? "99+" : memoryCount}
+            </span>
+          )}
+        </div>
         <div className="flex-1">
           <p className={cn("text-xs font-medium", TIER_COLORS[advisor.tier])}>{advisor.tier}</p>
           <h3 className="font-semibold leading-tight">{advisor.name}</h3>

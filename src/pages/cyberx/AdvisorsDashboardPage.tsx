@@ -104,7 +104,7 @@ export function AdvisorsDashboardPage() {
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">Your Advisor Panel</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ADVISORS.map((a) => (
-            <AdvisorCard key={a.id} advisor={a} />
+            <AdvisorCard key={a.id} advisor={a} memoryCount={memoryCounts[a.id] || 0} />
           ))}
         </div>
       </div>
