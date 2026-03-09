@@ -83,6 +83,28 @@ export function TwinMemoryPage() {
     }
   };
 
+  const addMemory = async () => {
+    if (!newMemory.advisorId || !newMemory.content.trim()) {
+      toast.error("Please select a twin and enter memory content");
+      return;
+    }
+    setAdding(true);
+    const { data, error } = await supabase.from("twin_memories").insert({
+      advisor_id: newMemory.advisorId,
+      memory_type: newMemory.type,
+      content: newMemory.content.trim(),
+    }).select().single();
+    if (error) {
+      toast.error("Failed to add memory");
+    } else {
+      setMemories(prev => [data, ...prev]);
+      setNewMemory({ advisorId: "", type: "fact", content: "" });
+      setAddDialogOpen(false);
+      toast.success("Memory added to Digital Twin");
+    }
+    setAdding(false);
+  };
+
   const getAdvisorName = (advisorId: string) => {
     const a = advisors.find(a => a.id === advisorId);
     return a ? a.name : "Unknown";
