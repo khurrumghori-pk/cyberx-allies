@@ -188,23 +188,27 @@ const Index = () => {
       {/* Advisor Lineup */}
       <section className="py-20 bg-secondary/30 border-y border-border/40">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-12 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-accent">AI Advisor Roster</p>
-            <h2 className="font-display text-3xl text-foreground">6 Specialized Digital Twins</h2>
-          </div>
+          <ScrollFadeIn>
+            <div className="text-center mb-12 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent">AI Advisor Roster</p>
+              <h2 className="font-display text-3xl text-foreground">6 Specialized Digital Twins</h2>
+            </div>
+          </ScrollFadeIn>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ADVISORS_PREVIEW.map((a) => (
-              <div key={a.name} className="cyberx-panel p-5 flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-                  <Bot className="h-6 w-6 text-primary" />
+            {ADVISORS_PREVIEW.map((a, i) => (
+              <ScrollFadeIn key={a.name} delay={i * 80}>
+                <div className="cyberx-panel p-5 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+                    <Bot className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{a.name}</p>
+                    <p className="text-xs text-muted-foreground">{a.role}</p>
+                  </div>
+                  <span className="ml-auto cyberx-pill text-[10px]">{a.tier}</span>
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground">{a.name}</p>
-                  <p className="text-xs text-muted-foreground">{a.role}</p>
-                </div>
-                <span className="ml-auto cyberx-pill text-[10px]">{a.tier}</span>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
