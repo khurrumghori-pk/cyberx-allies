@@ -12,7 +12,7 @@ const MARKETPLACE_ADVISORS = [
   { id: "m6", name: "Threat Hunting Advisor", tier: "Standard", tags: ["Hunting", "Hypothesis"], rating: 4.9, installs: 601, description: "Generates proactive hunt hypotheses from MITRE ATT&CK, threat reports, and historical telemetry." },
 ];
 
-const TIER_COLORS: Record<string, string> = { Premium: "text-yellow-400", Enterprise: "text-purple-400", Specialty: "text-accent", Standard: "text-primary" };
+const TIER_COLORS: Record<string, string> = { Premium: "text-[hsl(48_96%_53%)]", Enterprise: "text-[hsl(267_90%_66%)]", Specialty: "text-accent", Standard: "text-primary" };
 
 export function AdvisorMarketplacePage() {
   const [installed, setInstalled] = useState<Set<string>>(new Set(["m4", "m6"]));
