@@ -11,6 +11,8 @@ import { AuthPage } from "./pages/AuthPage";
 import { AdvisorsDashboardPage } from "./pages/cyberx/AdvisorsDashboardPage";
 import { MultiAgentChatPage } from "./pages/cyberx/MultiAgentChatPage";
 import { AdvisorBuilderPage } from "./pages/cyberx/AdvisorBuilderPage";
+import { MBTITestPage } from "./pages/cyberx/MBTITestPage";
+import { PsychometricTestPage } from "./pages/cyberx/PsychometricTestPage";
 import { TeamDigitalTwinPage } from "./pages/cyberx/TeamDigitalTwinPage";
 import { CollectiveMemoryPage } from "./pages/cyberx/CollectiveMemoryPage";
 import { AdvisorMarketplacePage } from "./pages/cyberx/AdvisorMarketplacePage";
@@ -45,6 +47,16 @@ const App = () => (
             <Route path="/advisors/builder" element={
               <ProtectedRoute allowedRoles={["admin", "vciso"]}>
                 <AdvisorBuilderPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisors/builder/mbti" element={
+              <ProtectedRoute allowedRoles={["admin", "vciso"]}>
+                <MBTITestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisors/builder/psychometric" element={
+              <ProtectedRoute allowedRoles={["admin", "vciso"]}>
+                <PsychometricTestPage />
               </ProtectedRoute>
             } />
             <Route path="/advisors/team-twin" element={

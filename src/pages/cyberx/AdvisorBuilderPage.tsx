@@ -3,7 +3,7 @@ import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X, Loader2, Sparkles } from "lucide-react";
+import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X, Loader2, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -506,7 +506,43 @@ export function AdvisorBuilderPage() {
               </div>
             </div>
 
-            {/* Few-Shot Examples */}
+            {/* MBTI & Psychometric Testing */}
+            <div className="space-y-3 pt-4 border-t border-border/40">
+              <label className="text-xs font-medium text-muted-foreground">Personality & Psychometric Profiling</label>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+                      <Brain className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">MBTI Assessment</p>
+                      <p className="text-[10px] text-muted-foreground">Cognitive personality type (e.g. INTJ, ENTP)</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">8 cybersecurity-contextualized questions to determine how the advisor processes information and makes decisions.</p>
+                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/mbti")}>
+                    Start MBTI Test <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+
+                <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center">
+                      <Activity className="h-5 w-5 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Psychometric Profile</p>
+                      <p className="text-[10px] text-muted-foreground">Big Five+ trait analysis (8 dimensions)</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">16 Likert-scale statements measuring openness, conscientiousness, resilience, analytical rigor, and more.</p>
+                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/psychometric")}>
+                    Start Psychometric Test <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </div>
             <div className="space-y-3 pt-4 border-t border-border/40">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-muted-foreground">Few-Shot Examples (Optional)</label>
