@@ -19,6 +19,7 @@ const NAV: NavItem[] = [
   { label: "Multi-Agent Chat", href: "/advisors/chat", icon: MessageSquare },
   { label: "Advisor Builder", href: "/advisors/builder", icon: Bot },
   { label: "Team Digital Twin", href: "/advisors/team-twin", icon: Users },
+  { label: "Org Chart", href: "/advisors/org-chart", icon: Network },
   { label: "Twin Management", href: "/advisors/twin-admin", icon: UserCog },
   { label: "Twin Memory", href: "/advisors/twin-memory", icon: Brain },
   { label: "Cyber Memory", href: "/advisors/memory", icon: Brain },
