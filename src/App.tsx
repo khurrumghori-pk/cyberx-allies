@@ -23,6 +23,7 @@ import { ProactiveNotificationsPage } from "./pages/cyberx/ProactiveNotification
 import { InstallPage } from "./pages/cyberx/InstallPage";
 import { AdminTwinAssignmentPage } from "./pages/cyberx/AdminTwinAssignmentPage";
 import { TwinMemoryPage } from "./pages/cyberx/TwinMemoryPage";
+import { OrgChartPage } from "./pages/cyberx/OrgChartPage";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,11 @@ const App = () => (
             <Route path="/advisors/twin-memory" element={
               <ProtectedRoute>
                 <TwinMemoryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisors/org-chart" element={
+              <ProtectedRoute>
+                <OrgChartPage />
               </ProtectedRoute>
             } />
             <Route path="/install" element={<InstallPage />} />
