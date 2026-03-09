@@ -131,14 +131,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Hero image */}
-          <div className="mt-16 rounded-2xl border border-border/60 overflow-hidden shadow-2xl shadow-primary/10">
-            <img
-              src={heroBanner}
-              alt="CyberX Command Center with multi-agent collaboration"
-              className="w-full h-auto"
-              loading="eager"
-            />
+          {/* Animated product demo */}
+          <div className="mt-16">
+            <HeroDemoWalkthrough />
           </div>
         </div>
       </section>
