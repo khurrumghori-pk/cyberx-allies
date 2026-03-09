@@ -22,6 +22,7 @@ import { GovernancePanelPage } from "./pages/cyberx/GovernancePanelPage";
 import { ProactiveNotificationsPage } from "./pages/cyberx/ProactiveNotificationsPage";
 import { InstallPage } from "./pages/cyberx/InstallPage";
 import { AdminTwinAssignmentPage } from "./pages/cyberx/AdminTwinAssignmentPage";
+import { TwinMemoryPage } from "./pages/cyberx/TwinMemoryPage";
 
 const queryClient = new QueryClient();
 
