@@ -3,6 +3,7 @@ import { AdvisorCard } from "@/components/cyberx/AdvisorCard";
 import { ADVISORS } from "@/data/cyberx-advisors";
 import { ThreatRadarChart } from "@/components/cyberx/ThreatRadarChart";
 import { PersonalitySummaryCard } from "@/components/cyberx/PersonalitySummaryCard";
+import { MyDigitalTwinCard } from "@/components/cyberx/MyDigitalTwinCard";
 import { Activity, ShieldAlert, Cpu, TrendingUp } from "lucide-react";
 import heroBanner from "@/assets/cyberx-hero-banner.jpg";
 
