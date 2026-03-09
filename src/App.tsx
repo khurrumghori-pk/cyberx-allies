@@ -18,6 +18,7 @@ import { AdvisorAnalyticsPage } from "./pages/cyberx/AdvisorAnalyticsPage";
 import { IntegrationPanelPage } from "./pages/cyberx/IntegrationPanelPage";
 import { GovernancePanelPage } from "./pages/cyberx/GovernancePanelPage";
 import { ProactiveNotificationsPage } from "./pages/cyberx/ProactiveNotificationsPage";
+import { InstallPage } from "./pages/cyberx/InstallPage";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
                 <ProactiveNotificationsPage />
               </ProtectedRoute>
             } />
+            <Route path="/install" element={<InstallPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

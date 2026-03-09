@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, MessageSquare, Bot, Users, Brain,
   ShoppingBag, BarChart2, PlugZap, Shield, Bell,
-  ChevronRight, Menu, X, ExternalLink, LogOut, User
+  ChevronRight, Menu, X, ExternalLink, LogOut, User, Download
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -163,7 +163,10 @@ export function CyberXLayout({ children, title, breadcrumb }: CyberXLayoutProps)
 
         {/* Footer */}
         {sidebarOpen && (
-          <div className="border-t border-sidebar-border px-4 py-3">
+          <div className="border-t border-sidebar-border px-4 py-3 space-y-2">
+            <Link to="/install" className="flex items-center gap-2 text-xs text-primary hover:text-foreground font-medium">
+              <Download className="h-3 w-3" /> Install App
+            </Link>
             <Link to="/" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">
               <ExternalLink className="h-3 w-3" /> CyberX Home
             </Link>
