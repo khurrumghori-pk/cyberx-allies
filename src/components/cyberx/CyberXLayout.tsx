@@ -114,9 +114,7 @@ export function CyberXLayout({ children, title, breadcrumb }: CyberXLayoutProps)
           )}
           <div className="ml-auto flex items-center gap-3">
             <span className="cyberx-pill">ConversX Engine</span>
-            <div className="h-8 w-8 rounded-full border border-border bg-secondary/80 flex items-center justify-center text-xs font-semibold">
-              JD
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
