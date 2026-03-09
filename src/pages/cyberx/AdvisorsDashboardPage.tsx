@@ -22,6 +22,46 @@ const KPI = ({ label, value, sub, icon: Icon }: { label: string; value: string; 
 );
 
 export function AdvisorsDashboardPage() {
+  const { user } = useAuth();
+  const [memoryCounts, setMemoryCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch memory counts grouped by advisor role
+    const fetchMemoryCounts = async () => {
+      const { data: advisors } = await supabase
+        .from("advisors")
+        .select("id, role")
+        .or(`assigned_user_id.eq.${user.id},tenant_id.eq.${user.id}`);
+      
+      if (!advisors?.length) return;
+      
+      const { data: memories } = await supabase
+        .from("twin_memories")
+        .select("advisor_id");
+      
+      if (!memories) return;
+      
+      // Map advisor IDs to their roles, then count memories per role
+      const idToRole: Record<string, string> = {};
+      advisors.forEach(a => { idToRole[a.id] = a.role; });
+      
+      const counts: Record<string, number> = {};
+      memories.forEach(m => {
+        const role = idToRole[m.advisor_id];
+        if (role) {
+          // Map DB role to static advisor id
+          const staticId = ADVISORS.find(a => a.role === role)?.id;
+          if (staticId) {
+            counts[staticId] = (counts[staticId] || 0) + 1;
+          }
+        }
+      });
+      setMemoryCounts(counts);
+    };
+    fetchMemoryCounts();
+  }, [user]);
+
   return (
     <CyberXLayout title="Advisors Dashboard" breadcrumb={["CyberX", "Dashboard"]}>
       {/* Hero Banner */}
