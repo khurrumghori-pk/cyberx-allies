@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { Button } from "@/components/ui/button";
-import { Users, Loader2, ChevronDown } from "lucide-react";
+import { Users, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/team-twin-chat`;
 
 const SAMPLE_QUERIES = [
   "How is the threat landscape evolving for our banking platform?",
@@ -9,29 +12,144 @@ const SAMPLE_QUERIES = [
   "Which threat actors are most likely to target us this quarter?",
 ];
 
-const SAMPLE_RESPONSE = `**Threat Landscape Summary — Banking Platform**
+async function streamTeamTwinResponse({
+  userMessage,
+  conversationHistory,
+  onDelta,
+  onDone,
+  signal,
+}: {
+  userMessage: string;
+  conversationHistory: { role: "user" | "assistant"; content: string }[];
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  signal?: AbortSignal;
+}) {
+  const messages = [
+    ...conversationHistory,
+    { role: "user" as const, content: userMessage },
+  ];
 
-- **APT41** remains the highest-priority adversary. Recent campaigns leverage spear-phishing + supply chain infiltration targeting SWIFT gateway components.
-- **Ransomware Syndicates (LockBit 4.x)**: Dwell-time in FSI sector has dropped to 4 days. Recommend increasing EDR coverage to 100% of servers.
-- **Open Indicators**: 3 known C2 IPs observed in recent OSINT overlap with your perimeter firewall denies.
+  const resp = await fetch(CHAT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    },
+    body: JSON.stringify({ messages }),
+    signal,
+  });
 
-**Collective Recommendation**: Prioritize threat-intel enrichment pipeline, patch CVE-2024-38063 (CVSS 9.8) on 14 affected hosts, and schedule IR tabletop for Q2.`;
+  if (!resp.ok) {
+    const errData = await resp.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(errData.error || `HTTP ${resp.status}`);
+  }
+
+  if (!resp.body) throw new Error("No response body");
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let done = false;
+
+  while (!done) {
+    const { done: readerDone, value } = await reader.read();
+    if (readerDone) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let newlineIdx: number;
+    while ((newlineIdx = buffer.indexOf("\n")) !== -1) {
+      let line = buffer.slice(0, newlineIdx);
+      buffer = buffer.slice(newlineIdx + 1);
+      if (line.endsWith("\r")) line = line.slice(0, -1);
+      if (line.startsWith(":") || line.trim() === "") continue;
+      if (!line.startsWith("data: ")) continue;
+
+      const jsonStr = line.slice(6).trim();
+      if (jsonStr === "[DONE]") {
+        done = true;
+        break;
+      }
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+        if (content) onDelta(content);
+      } catch {
+        buffer = line + "\n" + buffer;
+        break;
+      }
+    }
+  }
+
+  // flush remainder
+  if (buffer.trim()) {
+    for (let raw of buffer.split("\n")) {
+      if (!raw) continue;
+      if (raw.endsWith("\r")) raw = raw.slice(0, -1);
+      if (!raw.startsWith("data: ")) continue;
+      const jsonStr = raw.slice(6).trim();
+      if (jsonStr === "[DONE]") continue;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+        if (content) onDelta(content);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+  onDone();
+}
 
 export function TeamDigitalTwinPage() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
+  const [history, setHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const ask = (q: string) => {
+  const ask = async (q: string) => {
     const text = q || query;
-    if (!text) return;
+    if (!text || loading) return;
     setQuery(text);
     setLoading(true);
     setResponse("");
-    setTimeout(() => {
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    let accumulated = "";
+    try {
+      await streamTeamTwinResponse({
+        userMessage: text,
+        conversationHistory: history,
+        signal: controller.signal,
+        onDelta: (chunk) => {
+          accumulated += chunk;
+          setResponse(accumulated);
+        },
+        onDone: () => {
+          setLoading(false);
+          setHistory((prev) => [
+            ...prev,
+            { role: "user", content: text },
+            { role: "assistant", content: accumulated },
+          ]);
+        },
+      });
+    } catch (err: unknown) {
+      if ((err as Error).name !== "AbortError") {
+        setResponse(`⚠ Error: ${(err as Error).message}`);
+      }
       setLoading(false);
-      setResponse(SAMPLE_RESPONSE);
-    }, 1800);
+    }
+
+    abortRef.current = null;
+  };
+
+  const handleStop = () => {
+    abortRef.current?.abort();
+    setLoading(false);
   };
 
   return (
@@ -47,16 +165,25 @@ export function TeamDigitalTwinPage() {
               placeholder="Ask the collective intelligence of your SOC team…"
               className="w-full rounded-lg border border-border/80 bg-secondary/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary resize-none"
             />
-            <Button variant="hero" onClick={() => ask(query)} disabled={loading || !query}>
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {loading ? "Processing…" : "Ask Team"}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="hero" onClick={() => ask(query)} disabled={loading || !query}>
+                {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                {loading ? "Processing…" : "Ask Team"}
+              </Button>
+              {loading && (
+                <Button variant="outline" onClick={handleStop}>
+                  Stop
+                </Button>
+              )}
+            </div>
           </div>
 
           {response && (
             <div className="cyberx-panel border-accent/30 p-5 space-y-3">
               <p className="cyberx-pill border-accent/40 text-accent">Collective Response</p>
-              <div className="prose prose-invert prose-sm max-w-none text-sm text-foreground whitespace-pre-line">{response}</div>
+              <div className="prose prose-invert prose-sm max-w-none text-sm text-foreground">
+                <ReactMarkdown>{response}</ReactMarkdown>
+              </div>
             </div>
           )}
         </div>

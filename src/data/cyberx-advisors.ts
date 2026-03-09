@@ -1,3 +1,10 @@
+import advisorSoc from "@/assets/advisor-soc.png";
+import advisorThreatIntel from "@/assets/advisor-threat-intel.png";
+import advisorIr from "@/assets/advisor-ir.png";
+import advisorVciso from "@/assets/advisor-vciso.png";
+import advisorMalware from "@/assets/advisor-malware.png";
+import advisorHunter from "@/assets/advisor-hunter.png";
+
 export interface Advisor {
   id: string;
   name: string;
@@ -10,6 +17,7 @@ export interface Advisor {
   sessions: number;
   initials: string;
   glowColor: string;
+  avatarUrl?: string;
 }
 
 export const ADVISORS: Advisor[] = [
@@ -25,6 +33,7 @@ export const ADVISORS: Advisor[] = [
     sessions: 24,
     initials: "SOC",
     glowColor: "hsl(193 100% 56%)",
+    avatarUrl: advisorSoc,
   },
   {
     id: "threat",
@@ -38,6 +47,7 @@ export const ADVISORS: Advisor[] = [
     sessions: 19,
     initials: "TIA",
     glowColor: "hsl(166 95% 45%)",
+    avatarUrl: advisorThreatIntel,
   },
   {
     id: "ir",
@@ -51,6 +61,7 @@ export const ADVISORS: Advisor[] = [
     sessions: 14,
     initials: "IRA",
     glowColor: "hsl(38 95% 55%)",
+    avatarUrl: advisorIr,
   },
   {
     id: "vciso",
@@ -64,6 +75,7 @@ export const ADVISORS: Advisor[] = [
     sessions: 11,
     initials: "vCI",
     glowColor: "hsl(267 90% 66%)",
+    avatarUrl: advisorVciso,
   },
   {
     id: "malware",
@@ -77,6 +89,7 @@ export const ADVISORS: Advisor[] = [
     sessions: 8,
     initials: "MAA",
     glowColor: "hsl(0 72% 52%)",
+    avatarUrl: advisorMalware,
   },
   {
     id: "hunter",
@@ -90,5 +103,6 @@ export const ADVISORS: Advisor[] = [
     sessions: 7,
     initials: "THA",
     glowColor: "hsl(193 100% 56%)",
+    avatarUrl: advisorHunter,
   },
 ];

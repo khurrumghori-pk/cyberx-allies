@@ -13,6 +13,24 @@ const SIZE_CLASSES = {
 };
 
 export function AdvisorAvatar({ advisor, size = "md" }: AdvisorAvatarProps) {
+  if (advisor.avatarUrl) {
+    return (
+      <div
+        className={cn(
+          "shrink-0 rounded-full border border-border/80 overflow-hidden",
+          SIZE_CLASSES[size]
+        )}
+        style={{ boxShadow: `0 0 12px ${advisor.glowColor}55` }}
+      >
+        <img
+          src={advisor.avatarUrl}
+          alt={advisor.shortName}
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
