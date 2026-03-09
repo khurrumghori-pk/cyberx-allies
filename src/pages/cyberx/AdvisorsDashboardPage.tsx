@@ -39,6 +39,9 @@ export function AdvisorsDashboardPage() {
         </div>
       </div>
 
+      {/* My Digital Twin */}
+      <MyDigitalTwinCard />
+
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KPI label="Active Advisors" value="7" sub="+2 this week" icon={Cpu} />
