@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, MessageSquare, Bot, Users, Brain,
   ShoppingBag, BarChart2, PlugZap, Shield, Bell,
-  ChevronRight, Menu, X, ExternalLink, LogOut, User
+  ChevronRight, Menu, X, ExternalLink, LogOut, User, Download
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
