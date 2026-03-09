@@ -94,6 +94,8 @@ export function AdvisorBuilderPage() {
   const [testQuery, setTestQuery] = useState("How should we respond to a ransomware alert?");
   const [testResponse, setTestResponse] = useState("");
   const [testLoading, setTestLoading] = useState(false);
+  const mbtiFileRef = useRef<HTMLInputElement>(null);
+  const psychoFileRef = useRef<HTMLInputElement>(null);
   
   const [draft, setDraft] = useState<AdvisorDraft>({
     name: "",
@@ -117,6 +119,55 @@ export function AdvisorBuilderPage() {
     access_roles: ["soc_analyst", "vciso", "admin"],
     telemetry_enabled: true,
   });
+
+  // Load test results from localStorage (set by MBTI/Psychometric submodules)
+  useEffect(() => {
+    const mbtiRaw = localStorage.getItem("cyberx_mbti_result");
+    const psychoRaw = localStorage.getItem("cyberx_psychometric_result");
+    if (mbtiRaw || psychoRaw) {
+      setDraft((d) => ({
+        ...d,
+        persona_profile: {
+          ...d.persona_profile,
+          ...(mbtiRaw ? { mbti: JSON.parse(mbtiRaw) } : {}),
+          ...(psychoRaw ? { psychometric: JSON.parse(psychoRaw) } : {}),
+        },
+      }));
+      if (mbtiRaw) localStorage.removeItem("cyberx_mbti_result");
+      if (psychoRaw) localStorage.removeItem("cyberx_psychometric_result");
+    }
+  }, []);
+
+  const handleFileUpload = (type: "mbti" | "psychometric") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (type === "mbti") {
+          // Validate minimal structure
+          if (!data.type || !data.dimensions) {
+            toast.error("Invalid MBTI JSON. Expected { type, label, dimensions }");
+            return;
+          }
+          setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, mbti: data } }));
+          toast.success(`MBTI result uploaded: ${data.type}`);
+        } else {
+          if (!data.traits || !Array.isArray(data.traits)) {
+            toast.error("Invalid Psychometric JSON. Expected { traits: [...] }");
+            return;
+          }
+          setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, psychometric: data } }));
+          toast.success(`Psychometric profile uploaded (${data.traits.length} traits)`);
+        }
+      } catch {
+        toast.error("Invalid JSON file");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
 
   const updateDraft = <K extends keyof AdvisorDraft>(key: K, value: AdvisorDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
