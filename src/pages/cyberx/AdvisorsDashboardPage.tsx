@@ -49,6 +49,9 @@ export function AdvisorsDashboardPage() {
       {/* Threat Radar Chart */}
       <ThreatRadarChart />
 
+      {/* Personality Summary */}
+      <PersonalitySummaryCard />
+
       {/* Advisor cards */}
       <div>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">Your Advisor Panel</h2>
