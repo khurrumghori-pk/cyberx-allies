@@ -21,12 +21,33 @@ serve(async (req) => {
 
     let systemPrompt = "";
 
+    let memoryContext = "";
+    if (targetAdvisorId) {
+      try {
+        const authHeader = req.headers.get("Authorization");
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+        const supabase = createClient(supabaseUrl, supabaseKey, { 
+          global: { headers: { Authorization: authHeader || "" } } 
+        });
+        
+        const { data: memories } = await supabase.from("twin_memories").select("content").eq("advisor_id", targetAdvisorId).limit(5);
+        if (memories && memories.length > 0) {
+          memoryContext = `\n\nLearned Context & Preferences:\n` + memories.map(m => `- ${m.content}`).join("\n");
+        }
+      } catch (e) {
+        console.error("Failed to fetch memories", e);
+      }
+    }
+
     if (mode === "twin") {
       systemPrompt = `You are the Digital Twin of ${targetUserName || "a team member"}. You represent their knowledge, expertise, communication style, and institutional memory.
+      
+${memoryContext}
 
 When responding as this person's Digital Twin:
 1. Answer as if you ARE this person, using "I" perspective
-2. Draw on typical domain expertise for their role
+2. Draw on typical domain expertise for their role and the learned context above
 3. Reference relevant past experiences and knowledge areas
 4. Be helpful and collaborative — you're enabling async communication
 5. If unsure about specifics, acknowledge it naturally: "I'd need to double-check that, but from what I recall…"
