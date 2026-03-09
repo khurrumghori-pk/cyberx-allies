@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CyberXLayout } from "@/components/cyberx/CyberXLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X, Loader2, Sparkles, Activity } from "lucide-react";
+import { Check, ChevronRight, Shield, BookOpen, Brain, Lock, Eye, Play, Upload, Plus, X, Loader2, Sparkles, Activity, FileUp, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -47,6 +47,17 @@ const TONE_OPTIONS = ["Professional", "Concise", "Conversational", "Technical", 
 const DECISION_STYLES = ["Conservative", "Balanced", "Aggressive"];
 const RISK_TOLERANCES = ["Risk-Averse", "Moderate", "Risk-Taking"];
 
+interface MBTIResult {
+  type: string;
+  label: string;
+  description: string;
+  dimensions: { axis: string; label: string; value: number }[];
+}
+
+interface PsychometricResult {
+  traits: { trait: string; label: string; score: number; description: string }[];
+}
+
 interface AdvisorDraft {
   name: string;
   role: string;
@@ -59,6 +70,8 @@ interface AdvisorDraft {
     decision_style: string;
     risk_tolerance: string;
     vocabulary: string;
+    mbti?: MBTIResult;
+    psychometric?: PsychometricResult;
   };
   prompt_dna: {
     system_instructions: string;
@@ -81,6 +94,8 @@ export function AdvisorBuilderPage() {
   const [testQuery, setTestQuery] = useState("How should we respond to a ransomware alert?");
   const [testResponse, setTestResponse] = useState("");
   const [testLoading, setTestLoading] = useState(false);
+  const mbtiFileRef = useRef<HTMLInputElement>(null);
+  const psychoFileRef = useRef<HTMLInputElement>(null);
   
   const [draft, setDraft] = useState<AdvisorDraft>({
     name: "",
@@ -104,6 +119,55 @@ export function AdvisorBuilderPage() {
     access_roles: ["soc_analyst", "vciso", "admin"],
     telemetry_enabled: true,
   });
+
+  // Load test results from localStorage (set by MBTI/Psychometric submodules)
+  useEffect(() => {
+    const mbtiRaw = localStorage.getItem("cyberx_mbti_result");
+    const psychoRaw = localStorage.getItem("cyberx_psychometric_result");
+    if (mbtiRaw || psychoRaw) {
+      setDraft((d) => ({
+        ...d,
+        persona_profile: {
+          ...d.persona_profile,
+          ...(mbtiRaw ? { mbti: JSON.parse(mbtiRaw) } : {}),
+          ...(psychoRaw ? { psychometric: JSON.parse(psychoRaw) } : {}),
+        },
+      }));
+      if (mbtiRaw) localStorage.removeItem("cyberx_mbti_result");
+      if (psychoRaw) localStorage.removeItem("cyberx_psychometric_result");
+    }
+  }, []);
+
+  const handleFileUpload = (type: "mbti" | "psychometric") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (type === "mbti") {
+          // Validate minimal structure
+          if (!data.type || !data.dimensions) {
+            toast.error("Invalid MBTI JSON. Expected { type, label, dimensions }");
+            return;
+          }
+          setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, mbti: data } }));
+          toast.success(`MBTI result uploaded: ${data.type}`);
+        } else {
+          if (!data.traits || !Array.isArray(data.traits)) {
+            toast.error("Invalid Psychometric JSON. Expected { traits: [...] }");
+            return;
+          }
+          setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, psychometric: data } }));
+          toast.success(`Psychometric profile uploaded (${data.traits.length} traits)`);
+        }
+      } catch {
+        toast.error("Invalid JSON file");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
 
   const updateDraft = <K extends keyof AdvisorDraft>(key: K, value: AdvisorDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -242,8 +306,8 @@ export function AdvisorBuilderPage() {
         description: draft.description,
         tier: draft.tier,
         knowledge_refs: draft.knowledge_refs,
-        persona_profile: draft.persona_profile,
-        prompt_dna: draft.prompt_dna,
+        persona_profile: draft.persona_profile as any,
+        prompt_dna: draft.prompt_dna as any,
         access_roles: draft.access_roles,
         telemetry_enabled: draft.telemetry_enabled,
         state: "training",
@@ -510,36 +574,108 @@ export function AdvisorBuilderPage() {
             <div className="space-y-3 pt-4 border-t border-border/40">
               <label className="text-xs font-medium text-muted-foreground">Personality & Psychometric Profiling</label>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+                {/* MBTI Card */}
+                <div className={cn(
+                  "rounded-xl border p-4 space-y-3",
+                  draft.persona_profile.mbti ? "border-accent/50 bg-accent/5" : "border-primary/30 bg-primary/5"
+                )}>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
                       <Brain className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground">MBTI Assessment</p>
                       <p className="text-[10px] text-muted-foreground">Cognitive personality type (e.g. INTJ, ENTP)</p>
                     </div>
+                    {draft.persona_profile.mbti && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-accent/20 border border-accent/40 px-2.5 py-1">
+                        <CheckCircle className="h-3 w-3 text-accent" />
+                        <span className="text-xs font-bold text-accent">{draft.persona_profile.mbti.type}</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">8 cybersecurity-contextualized questions to determine how the advisor processes information and makes decisions.</p>
-                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/mbti")}>
-                    Start MBTI Test <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
+                  {draft.persona_profile.mbti ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">{draft.persona_profile.mbti.description || draft.persona_profile.mbti.label}</p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {draft.persona_profile.mbti.dimensions?.map((d) => (
+                          <div key={d.axis} className="rounded-md bg-primary/10 border border-primary/20 p-1.5 text-center">
+                            <span className="text-[10px] font-bold text-primary">{d.value}%</span>
+                            <p className="text-[8px] text-muted-foreground">{d.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, mbti: undefined } }))}>
+                        <X className="h-3 w-3 mr-1" /> Clear Result
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">8 cybersecurity-contextualized questions or upload existing results.</p>
+                      <div className="flex gap-2">
+                        <Button variant="neon" size="sm" className="flex-1" onClick={() => navigate("/advisors/builder/mbti")}>
+                          Start Test <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1" onClick={() => mbtiFileRef.current?.click()}>
+                          <FileUp className="h-3.5 w-3.5" /> Upload
+                        </Button>
+                        <input ref={mbtiFileRef} type="file" accept=".json" className="hidden" onChange={handleFileUpload("mbti")} />
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3">
+                {/* Psychometric Card */}
+                <div className={cn(
+                  "rounded-xl border p-4 space-y-3",
+                  draft.persona_profile.psychometric ? "border-accent/50 bg-accent/5" : "border-accent/30 bg-accent/5"
+                )}>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center">
                       <Activity className="h-5 w-5 text-accent" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground">Psychometric Profile</p>
                       <p className="text-[10px] text-muted-foreground">Big Five+ trait analysis (8 dimensions)</p>
                     </div>
+                    {draft.persona_profile.psychometric && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-accent/20 border border-accent/40 px-2.5 py-1">
+                        <CheckCircle className="h-3 w-3 text-accent" />
+                        <span className="text-xs font-medium text-accent">{draft.persona_profile.psychometric.traits.length} traits</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">16 Likert-scale statements measuring openness, conscientiousness, resilience, analytical rigor, and more.</p>
-                  <Button variant="neon" size="sm" className="w-full" onClick={() => navigate("/advisors/builder/psychometric")}>
-                    Start Psychometric Test <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
+                  {draft.persona_profile.psychometric ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {draft.persona_profile.psychometric.traits.slice(0, 4).map((t) => (
+                          <div key={t.trait} className="flex items-center justify-between rounded-md bg-accent/10 border border-accent/20 px-2 py-1">
+                            <span className="text-[9px] text-muted-foreground">{t.label}</span>
+                            <span className="text-[10px] font-bold text-accent">{t.score}%</span>
+                          </div>
+                        ))}
+                      </div>
+                      {draft.persona_profile.psychometric.traits.length > 4 && (
+                        <p className="text-[9px] text-muted-foreground text-center">+{draft.persona_profile.psychometric.traits.length - 4} more traits</p>
+                      )}
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setDraft((d) => ({ ...d, persona_profile: { ...d.persona_profile, psychometric: undefined } }))}>
+                        <X className="h-3 w-3 mr-1" /> Clear Result
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">16 Likert-scale statements or upload existing results.</p>
+                      <div className="flex gap-2">
+                        <Button variant="neon" size="sm" className="flex-1" onClick={() => navigate("/advisors/builder/psychometric")}>
+                          Start Test <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1" onClick={() => psychoFileRef.current?.click()}>
+                          <FileUp className="h-3.5 w-3.5" /> Upload
+                        </Button>
+                        <input ref={psychoFileRef} type="file" accept=".json" className="hidden" onChange={handleFileUpload("psychometric")} />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
