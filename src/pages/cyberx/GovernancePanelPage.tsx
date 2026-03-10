@@ -887,6 +887,7 @@ export function GovernancePanelPage() {
                       <th className="p-3">Control</th>
                       <th className="p-3">Name</th>
                       <th className="p-3">Status</th>
+                      <th className="p-3">Next Review</th>
                       <th className="p-3">Actions</th>
                     </tr>
                   </thead>
@@ -894,6 +895,7 @@ export function GovernancePanelPage() {
                     {filteredAssessments.map(a => {
                       const ss = STATUS_STYLES[a.status] || STATUS_STYLES.not_assessed;
                       const fw = FRAMEWORKS.find(f => f.id === a.framework);
+                      const isOverdue = a.next_review && new Date(a.next_review) <= new Date();
                       return (
                         <tr key={a.id} className="border-b border-border/30 hover:bg-secondary/20">
                           <td className="p-3 text-xs">{fw?.icon} {fw?.name || a.framework}</td>
@@ -903,6 +905,19 @@ export function GovernancePanelPage() {
                             <span className={cn("inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border font-semibold", ss.bg, ss.text)}>
                               {ss.icon}{a.status.replace("_", " ")}
                             </span>
+                          </td>
+                          <td className="p-3">
+                            <input
+                              type="date"
+                              value={a.next_review || ""}
+                              onChange={async (e) => {
+                                const val = e.target.value || null;
+                                await supabase.from("compliance_assessments").update({ next_review: val } as any).eq("id", a.id);
+                                fetchData();
+                              }}
+                              className={cn("bg-transparent border border-border/40 rounded px-1.5 py-0.5 text-[10px] w-28", isOverdue ? "text-destructive border-destructive/40" : "text-muted-foreground")}
+                            />
+                            {isOverdue && <span className="text-[9px] text-destructive ml-1">Overdue</span>}
                           </td>
                           <td className="p-3">
                             <div className="flex gap-1">

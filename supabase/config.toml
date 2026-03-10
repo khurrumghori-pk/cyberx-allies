@@ -21,5 +21,8 @@ verify_jwt = false
 [functions.compliance-gap-analysis]
 verify_jwt = false
 
+[functions.check-compliance-reviews]
+verify_jwt = false
+
 [functions.twin-to-twin-chat]
 verify_jwt = false
