@@ -224,6 +224,12 @@ export function GovernancePanelPage() {
   // Expanded policies
   const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null);
 
+  // Gap analysis
+  const [showGapDialog, setShowGapDialog] = useState(false);
+  const [gapFramework, setGapFramework] = useState("");
+  const [gapAnalysis, setGapAnalysis] = useState("");
+  const [gapLoading, setGapLoading] = useState(false);
+
   /* ── Fetch ──────────────────────────────── */
 
   const fetchData = async () => {
