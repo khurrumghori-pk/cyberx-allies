@@ -839,12 +839,19 @@ export function GovernancePanelPage() {
                 <div className="w-full h-1.5 rounded-full bg-secondary overflow-hidden">
                   <div className={cn("h-full rounded-full", f.coverage >= 80 ? "bg-accent" : f.coverage >= 50 ? "bg-yellow-400" : "bg-destructive")} style={{ width: `${f.coverage}%` }} />
                 </div>
-                <div className="flex gap-2 text-[9px]">
-                  <span className="text-accent">{f.compliant} ✓</span>
-                  <span className="text-yellow-400">{f.partial} ◐</span>
-                  <span className="text-destructive">{f.nonCompliant} ✗</span>
-                  <span className="text-muted-foreground">{f.total - f.compliant - f.partial - f.nonCompliant} ?</span>
+                <div className="flex justify-between items-center text-[9px]">
+                  <div className="flex gap-2">
+                    <span className="text-accent">{f.compliant} ✓</span>
+                    <span className="text-yellow-400">{f.partial} ◐</span>
+                    <span className="text-destructive">{f.nonCompliant} ✗</span>
+                    <span className="text-muted-foreground">{f.total - f.compliant - f.partial - f.nonCompliant} ?</span>
+                  </div>
                 </div>
+                {(f.nonCompliant > 0 || f.partial > 0 || f.total - f.compliant - f.partial - f.nonCompliant > 0) && (
+                  <Button variant="ghost" size="sm" className="h-6 text-[10px] w-full mt-1 text-primary" onClick={(e) => { e.stopPropagation(); runGapAnalysis(f.id); }}>
+                    <Sparkles className="h-3 w-3 mr-1" />AI Gap Analysis
+                  </Button>
+                )}
               </button>
             ))}
           </div>
