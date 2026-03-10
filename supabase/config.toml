@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.generate-proactive-brief]
 verify_jwt = false
+
+[functions.compliance-gap-analysis]
+verify_jwt = false
+
+[functions.twin-to-twin-chat]
+verify_jwt = false
