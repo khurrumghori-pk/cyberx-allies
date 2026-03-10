@@ -424,6 +424,151 @@ export function GovernancePanelPage() {
     }
   };
 
+  /* ── AI Gap Analysis ───────────────────── */
+
+  const runGapAnalysis = async (framework: string) => {
+    const fwName = FRAMEWORKS.find(f => f.id === framework)?.name || framework;
+    setGapFramework(fwName);
+    setGapAnalysis("");
+    setGapLoading(true);
+    setShowGapDialog(true);
+
+    try {
+      const fwControls = assessments.filter(a => a.framework === framework);
+      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/compliance-gap-analysis`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          controls: fwControls,
+          framework: fwName,
+          policies: policies.map(p => ({ title: p.title, category: p.category, status: p.status })),
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: "AI analysis failed" }));
+        toast.error(err.error || "AI analysis failed");
+        setGapLoading(false);
+        return;
+      }
+
+      const reader = resp.body?.getReader();
+      if (!reader) { setGapLoading(false); return; }
+      const decoder = new TextDecoder();
+      let buf = "";
+      let result = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) !== -1) {
+          let line = buf.slice(0, nl);
+          buf = buf.slice(nl + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+          const json = line.slice(6).trim();
+          if (json === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(json);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) { result += content; setGapAnalysis(result); }
+          } catch { buf = line + "\n" + buf; break; }
+        }
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setGapLoading(false);
+    }
+  };
+
+  /* ── PDF Export ─────────────────────────── */
+
+  const exportCompliancePDF = () => {
+    const assessed = frameworkStats.filter(f => f.assessed);
+    const totalC = assessments.length;
+    const compliantC = assessments.filter(a => a.status === "compliant").length;
+    const partialC = assessments.filter(a => a.status === "partial").length;
+    const nonC = assessments.filter(a => a.status === "non_compliant").length;
+    const overallCoverage = totalC > 0 ? Math.round(((compliantC + partialC * 0.5) / totalC) * 100) : 0;
+
+    const fwRows = assessed.map(f => `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #333">${f.icon} ${f.name}</td>
+        <td style="padding:8px;border-bottom:1px solid #333;text-align:center">${f.total}</td>
+        <td style="padding:8px;border-bottom:1px solid #333;text-align:center;color:#22c55e">${f.compliant}</td>
+        <td style="padding:8px;border-bottom:1px solid #333;text-align:center;color:#eab308">${f.partial}</td>
+        <td style="padding:8px;border-bottom:1px solid #333;text-align:center;color:#ef4444">${f.nonCompliant}</td>
+        <td style="padding:8px;border-bottom:1px solid #333;text-align:center;font-weight:bold">${f.coverage}%</td>
+      </tr>`).join("");
+
+    const controlRows = assessments.map(a => {
+      const fw = FRAMEWORKS.find(f => f.id === a.framework);
+      const color = a.status === "compliant" ? "#22c55e" : a.status === "partial" ? "#eab308" : a.status === "non_compliant" ? "#ef4444" : "#888";
+      return `<tr>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">${fw?.name || a.framework}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px;font-family:monospace">${a.control_ref}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">${a.control_name}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px;color:${color};font-weight:600">${a.status.replace("_", " ")}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:10px">${a.evidence || "—"}</td>
+      </tr>`;
+    }).join("");
+
+    const policyRows = policies.map(p => `
+      <tr>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">${p.title}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">${p.category}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">${p.status}</td>
+        <td style="padding:6px;border-bottom:1px solid #222;font-size:11px">v${p.version}</td>
+      </tr>`).join("");
+
+    const html = `<!DOCTYPE html><html><head><title>Compliance Report - ${new Date().toLocaleDateString()}</title>
+    <style>
+      body{font-family:system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;margin:0;padding:40px}
+      h1{color:#38bdf8;margin-bottom:4px} h2{color:#38bdf8;margin-top:32px;border-bottom:1px solid #1e293b;padding-bottom:8px}
+      table{width:100%;border-collapse:collapse;margin-top:12px}
+      th{text-align:left;padding:8px;border-bottom:2px solid #334155;color:#94a3b8;font-size:11px;text-transform:uppercase}
+      .kpi{display:inline-block;background:#1e293b;border-radius:8px;padding:16px 24px;margin:8px;text-align:center}
+      .kpi .val{font-size:28px;font-weight:700;color:#38bdf8} .kpi .lbl{font-size:11px;color:#94a3b8;margin-top:4px}
+      .bar{height:8px;border-radius:4px;background:#1e293b;margin-top:4px;overflow:hidden}
+      .bar-fill{height:100%;border-radius:4px}
+      @media print{body{background:#fff;color:#1e293b} th{color:#64748b;border-color:#e2e8f0} .kpi{background:#f1f5f9} .kpi .val{color:#0284c7} h1,h2{color:#0284c7}}
+    </style></head><body>
+    <h1>🛡️ Compliance & Governance Report</h1>
+    <p style="color:#94a3b8;margin-bottom:24px">Generated: ${new Date().toLocaleString()} | Organization Compliance Assessment</p>
+
+    <h2>Executive Summary</h2>
+    <div style="margin:16px 0">
+      <div class="kpi"><div class="val">${overallCoverage}%</div><div class="lbl">Overall Coverage</div></div>
+      <div class="kpi"><div class="val">${totalC}</div><div class="lbl">Controls Assessed</div></div>
+      <div class="kpi"><div class="val">${compliantC}</div><div class="lbl">Compliant</div></div>
+      <div class="kpi"><div class="val" style="color:#ef4444">${nonC}</div><div class="lbl">Non-Compliant</div></div>
+      <div class="kpi"><div class="val">${policies.length}</div><div class="lbl">Policies</div></div>
+    </div>
+
+    <h2>Framework Coverage</h2>
+    <table><thead><tr><th>Framework</th><th style="text-align:center">Controls</th><th style="text-align:center">Compliant</th><th style="text-align:center">Partial</th><th style="text-align:center">Non-Compliant</th><th style="text-align:center">Coverage</th></tr></thead><tbody>${fwRows}</tbody></table>
+
+    <h2>Organizational Policies</h2>
+    <table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Version</th></tr></thead><tbody>${policyRows || '<tr><td colspan="4" style="padding:12px;color:#64748b">No policies uploaded</td></tr>'}</tbody></table>
+
+    <h2>Detailed Control Status</h2>
+    <table><thead><tr><th>Framework</th><th>Control</th><th>Name</th><th>Status</th><th>Evidence</th></tr></thead><tbody>${controlRows || '<tr><td colspan="5" style="padding:12px;color:#64748b">No assessments</td></tr>'}</tbody></table>
+
+    <div style="margin-top:40px;padding-top:16px;border-top:1px solid #334155;color:#64748b;font-size:10px">
+      CyberX Governance Platform — Confidential — ${new Date().toLocaleDateString()}
+    </div>
+    </body></html>`;
+
+    const w = window.open("", "_blank");
+    if (w) { w.document.write(html); w.document.close(); w.print(); }
+  };
+
   /* ── Computed ───────────────────────────── */
 
   const frameworkStats = FRAMEWORKS.map(fw => {
