@@ -10,11 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
 import {
   ShieldCheck, Lock, FileText, Users, AlertTriangle, Eye, Scale, Globe, Server,
   Plus, Upload, Loader2, Trash2, ChevronDown, ChevronRight, Pencil,
   CheckCircle2, XCircle, Clock, Download, History, Search, Filter,
-  BookOpen, ClipboardCheck, BarChart3, RefreshCw, Shield
+  BookOpen, ClipboardCheck, BarChart3, RefreshCw, Shield, Brain, FileDown, Sparkles
 } from "lucide-react";
 
 /* ── Types ──────────────────────────────────── */
