@@ -813,9 +813,14 @@ export function GovernancePanelPage() {
         <div className="space-y-5">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="font-display text-lg text-foreground">Compliance Assessments</h2>
-            <Button variant="hero" size="sm" onClick={() => setShowAssessDialog(true)}>
-              <Plus className="h-4 w-4 mr-1" />New Assessment
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={exportCompliancePDF} disabled={assessments.length === 0}>
+                <FileDown className="h-4 w-4 mr-1" />Export PDF
+              </Button>
+              <Button variant="neon" size="sm" onClick={() => setShowAssessDialog(true)}>
+                <Plus className="h-4 w-4 mr-1" />New Assessment
+              </Button>
+            </div>
           </div>
 
           {/* Framework summary cards */}
