@@ -1101,6 +1101,35 @@ export function GovernancePanelPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ────── GAP ANALYSIS DIALOG ────── */}
+      <Dialog open={showGapDialog} onOpenChange={setShowGapDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] bg-card border-border overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />AI Gap Analysis — {gapFramework}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-2">
+            {gapLoading && !gapAnalysis && (
+              <div className="flex items-center gap-2 py-8 justify-center text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span className="text-sm">Analyzing compliance gaps...</span>
+              </div>
+            )}
+            {gapAnalysis && (
+              <div className="prose prose-sm prose-invert max-w-none text-sm">
+                <ReactMarkdown>{gapAnalysis}</ReactMarkdown>
+              </div>
+            )}
+            {gapLoading && gapAnalysis && (
+              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />Analyzing...
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </CyberXLayout>
   );
 }
