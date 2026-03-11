@@ -56,14 +56,14 @@ const Index = () => {
             </div>
 
             <h1 className="font-display text-4xl md:text-6xl leading-tight text-foreground">
-              The First Cybersecurity Team{" "}
+              Beyond Assistants.{" "}
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                That Never Sleeps
+                Cybersecurity Counterparts.
               </span>
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Autonomous. Tireless. Complete. Deploy CyberX Advisors — agentic AI that work like real analysts to deliver 24/7 protection, tangible cost savings, and a stronger risk posture.
+              Enterprise‑grade AI digital twins for SOC operations, threat intelligence, and security governance — with persistent institutional memory and multi‑agent decisioning.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 pt-2">
