@@ -133,10 +133,10 @@ const Index = () => {
           <div className="cyberx-panel cyberx-signature-glow p-10 text-center space-y-6">
             <Shield className="h-12 w-12 text-primary mx-auto" />
             <h2 className="font-display text-2xl md:text-3xl text-foreground">
-              Experience Human‑Machine Symbiosis
+              Your Sovereign Cyber Defense Starts Here
             </h2>
             <p className="text-muted-foreground">
-              Deploy CyberX Advisors and build a resilient, AI‑augmented cyber defense capability where humans and AI work as one.
+              Deploy CyberX Advisors — digital twins that preserve your institutional knowledge, learn continuously, and never leave your organization.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild variant="hero" size="lg" className="text-base px-8">

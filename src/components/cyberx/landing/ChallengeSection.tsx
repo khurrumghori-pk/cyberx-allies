@@ -5,20 +5,20 @@ import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 const CHALLENGES = [
   {
     icon: UserX,
-    title: "Too Few Analysts",
-    desc: "Talent is scarce, yet tool sprawl keeps growing. Teams juggle multiple vendors, wasting hours switching contexts.",
+    title: "Sovereign Knowledge Loss",
+    desc: "When analysts leave, years of institutional knowledge vanish — threat context, incident history, and tribal expertise disappear overnight.",
     color: "text-[hsl(30_100%_40%)]",
   },
   {
     icon: AlertCircle,
-    title: "Too Many Alerts",
-    desc: "Security teams face thousands of alerts but not enough hands to respond, leading to missed threats and preventable breaches.",
+    title: "Alert Overload, Zero Context",
+    desc: "Thousands of alerts flood your SOC daily with no unified context. Without memory, every incident starts from scratch.",
     color: "text-[hsl(30_100%_40%)]",
   },
   {
     icon: Flame,
-    title: "Rising Costs & Burnout",
-    desc: "Budget limits block new hires, so existing teams overwork, morale drops, burnout spreads, and attackers exploit cracks.",
+    title: "Tool Sprawl & Decision Fatigue",
+    desc: "Dozens of disconnected tools, no single source of truth. Teams waste hours switching contexts while threats slip through the cracks.",
     color: "text-[hsl(30_100%_40%)]",
   },
 ];
@@ -28,10 +28,13 @@ const ChallengeSection = () => (
     <div className="mx-auto max-w-7xl px-6">
       <ScrollFadeIn>
         <div className="text-center mb-12 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-destructive">The Real Problem</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-destructive">The Sovereignty Gap</p>
           <h2 className="font-display text-2xl md:text-4xl text-foreground leading-tight">
-            Cybersecurity Isn't Failing from Attacks —<br className="hidden md:block" /> It's Failing from the Headcount Gap
+            Your Security Knowledge Shouldn't Walk Out the Door
           </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Traditional security relies on human memory. CyberX Advisors make your organization's cyber expertise permanent, sovereign, and always available.
+          </p>
         </div>
       </ScrollFadeIn>
       <div className="grid gap-6 md:grid-cols-3">
