@@ -44,15 +44,8 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Industry Toggle */}
-      <section className="pt-24 pb-2">
-        <div className="mx-auto max-w-7xl px-6 pt-6">
-          <IndustryToggle active={industry} onChange={setIndustry} />
-        </div>
-      </section>
-
       {/* Hero */}
-      <section className="relative pb-20 overflow-hidden">
+      <section className="relative pt-24 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[120px]" />
 
