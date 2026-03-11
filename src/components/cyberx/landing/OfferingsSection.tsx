@@ -4,21 +4,21 @@ import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 const OFFERINGS = [
   {
     icon: Layers,
-    title: "Security Programs",
-    desc: "Curated, stack‑able security programs — each solving a point problem from visibility to compliance, tailored to your maturity and business goals.",
+    title: "Sovereign Security Programs",
+    desc: "Curated, stack‑able security programs — each solving a point problem from visibility to compliance, with institutional memory baked in.",
     badge: "Teams solving a specific problem without overhauling their stack.",
   },
   {
     icon: UserCog,
-    title: "CyberX Advisors",
-    desc: "Agentic AI advisors embedded in your workflows to auto‑triage, enrich alerts, and maintain compliance. They act like real analysts.",
-    badge: "Lean security teams who want to scale without extra headcount.",
+    title: "CyberX Advisor Digital Twins",
+    desc: "Agentic AI counterparts embedded in your workflows — they remember every incident, learn your environment, and act like senior analysts who never leave.",
+    badge: "Lean security teams who want sovereign expertise at scale.",
   },
   {
     icon: HeadphonesIcon,
-    title: "24/7 Support + White Glove Onboarding",
-    desc: "Expert‑led onboarding and round‑the‑clock support to ensure effortless deployment and continuous success.",
-    badge: "From day one, you're never alone.",
+    title: "White Glove Onboarding & Support",
+    desc: "Expert‑led onboarding, knowledge transfer, and round‑the‑clock support to ensure your sovereign AI capability is operational from day one.",
+    badge: "From day one, your institutional knowledge is preserved.",
   },
 ];
 
@@ -27,9 +27,9 @@ const OfferingsSection = () => (
     <div className="mx-auto max-w-7xl px-6">
       <ScrollFadeIn>
         <div className="text-center mb-12 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Flexible Deployment</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sovereign Deployment</p>
           <h2 className="font-display text-2xl md:text-4xl text-foreground">Security Built Your Way</h2>
-          <p className="text-muted-foreground">Start with what you need. Scale when you're ready. Pay only for what you use.</p>
+          <p className="text-muted-foreground">Start with what you need. Scale when you're ready. Your knowledge stays yours.</p>
         </div>
       </ScrollFadeIn>
       <div className="grid gap-6 md:grid-cols-3">

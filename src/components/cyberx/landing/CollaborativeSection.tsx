@@ -14,12 +14,12 @@ const CollaborativeSection = () => (
       <ScrollFadeIn>
         <div className="cyberx-panel p-8 md:p-12 space-y-8 bg-gradient-to-br from-secondary/80 to-card/90 border-primary/20">
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Conversational AI</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Sovereign Conversational AI</p>
             <h2 className="font-display text-2xl md:text-3xl text-foreground">
-              Collaborative & Context-Aware Experience
+              Your Counterpart Remembers Everything
             </h2>
             <p className="text-muted-foreground max-w-2xl">
-              A transparent interface that partners with you — explaining decisions, suggesting next steps, and taking action in your workflow.
+              Unlike generic assistants, CyberX Advisors retain full context across every interaction — building institutional memory that compounds over time and never leaves your organization.
             </p>
           </div>
 
@@ -35,7 +35,7 @@ const CollaborativeSection = () => (
           <div className="rounded-full bg-secondary/80 border border-border/60 px-6 py-4 flex items-start gap-3">
             <MessageCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
             <p className="text-sm text-muted-foreground italic">
-              "SOC lead asks, 'Walk me through yesterday's malware alert.' Your advisor builds a timeline, highlights root cause, and recommends containment playbooks."
+              "Walk me through yesterday's malware alert." — Your advisor builds a timeline from sovereign memory, correlates with past incidents, and recommends containment playbooks.
             </p>
           </div>
         </div>

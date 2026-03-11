@@ -2,10 +2,10 @@ import { TrendingUp, Bot, Swords, Cpu } from "lucide-react";
 import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 
 const ROADMAP = [
-  { icon: TrendingUp, title: "Predictive Risk Forecasting", desc: "AI models that predict emerging risk hotspots before they become incidents.", tag: "Coming Soon" },
-  { icon: Bot, title: "Autonomous Remediation", desc: "End‑to‑end remediation workflows with full auditability and human oversight.", tag: "In Development" },
-  { icon: Swords, title: "Deep Adversarial Simulation", desc: "Continuous red‑teaming simulations to validate control effectiveness.", tag: "Research" },
-  { icon: Cpu, title: "OT/IoT Extended Ecosystem", desc: "Specialized advisors for operational technology and IoT environments.", tag: "Planned" },
+  { icon: TrendingUp, title: "Predictive Risk Forecasting", desc: "Sovereign AI models that predict emerging risk hotspots before they become incidents — using your organization's own threat history.", tag: "Coming Soon" },
+  { icon: Bot, title: "Autonomous Remediation", desc: "End‑to‑end remediation workflows with full auditability, human oversight, and institutional memory of every action taken.", tag: "In Development" },
+  { icon: Swords, title: "Adversarial Simulation", desc: "Continuous red‑teaming powered by your advisors' collective memory — testing controls against threats specific to your environment.", tag: "Research" },
+  { icon: Cpu, title: "OT/IoT Sovereign Twins", desc: "Specialized digital twin advisors for operational technology and IoT — persistent expertise for environments where turnover is critical.", tag: "Planned" },
 ];
 
 const RoadmapSection = () => (
@@ -15,8 +15,8 @@ const RoadmapSection = () => (
         <div className="cyberx-panel p-8 md:p-12 bg-gradient-to-br from-secondary/80 to-card/90 border-primary/20 space-y-8">
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-[hsl(45_100%_60%)]">Roadmap</p>
-            <h2 className="font-display text-2xl md:text-3xl text-foreground">The Road Ahead: Future Capabilities</h2>
-            <p className="text-muted-foreground">Continuously evolving to outpace threats. Here's what's coming.</p>
+            <h2 className="font-display text-2xl md:text-3xl text-foreground">The Road Ahead: Sovereign Capabilities</h2>
+            <p className="text-muted-foreground">Continuously evolving — your advisors get smarter with every interaction.</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {ROADMAP.map((r, i) => (

@@ -56,14 +56,14 @@ const Index = () => {
             </div>
 
             <h1 className="font-display text-4xl md:text-6xl leading-tight text-foreground">
-              The First Cybersecurity Team{" "}
+              Beyond Assistants.{" "}
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                That Never Sleeps
+                Cybersecurity Counterparts.
               </span>
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Autonomous. Tireless. Complete. Deploy CyberX Advisors — agentic AI that work like real analysts to deliver 24/7 protection, tangible cost savings, and a stronger risk posture.
+              Enterprise‑grade AI digital twins for SOC operations, threat intelligence, and security governance — with persistent institutional memory and multi‑agent decisioning.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 pt-2">
@@ -133,10 +133,10 @@ const Index = () => {
           <div className="cyberx-panel cyberx-signature-glow p-10 text-center space-y-6">
             <Shield className="h-12 w-12 text-primary mx-auto" />
             <h2 className="font-display text-2xl md:text-3xl text-foreground">
-              Experience Human‑Machine Symbiosis
+              Your Sovereign Cyber Defense Starts Here
             </h2>
             <p className="text-muted-foreground">
-              Deploy CyberX Advisors and build a resilient, AI‑augmented cyber defense capability where humans and AI work as one.
+              Deploy CyberX Advisors — digital twins that preserve your institutional knowledge, learn continuously, and never leave your organization.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild variant="hero" size="lg" className="text-base px-8">
