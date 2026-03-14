@@ -33,6 +33,24 @@ const Index = () => {
             </span>
             <span className="cyberx-pill text-[9px] ml-1">V2</span>
           </div>
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { label: "Challenge", id: "challenge" },
+              { label: "Platform", id: "platform" },
+              { label: "Results", id: "results" },
+              { label: "How It Works", id: "steps" },
+              { label: "Advisors", id: "advisors" },
+              { label: "Roadmap", id: "roadmap" },
+            ].map((nav) => (
+              <button
+                key={nav.id}
+                onClick={() => document.getElementById(nav.id)?.scrollIntoView({ behavior: "smooth" })}
+                className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary/50"
+              >
+                {nav.label}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center gap-3">
             <Button asChild variant="ghost" size="sm">
               <Link to="/auth">Sign In</Link>
@@ -86,46 +104,33 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Challenge: Headcount Gap */}
-      <ChallengeSection />
-
-      {/* Solution */}
-      <SolutionSection />
-
-      {/* Results Stats */}
-      <ResultsStats />
-
-      {/* Steps */}
-      <StepsSection />
-
-      {/* Collaborative Experience */}
+      <div id="challenge"><ChallengeSection /></div>
+      <div id="platform"><SolutionSection /></div>
+      <div id="results"><ResultsStats /></div>
+      <div id="steps"><StepsSection /></div>
       <CollaborativeSection />
-
-      {/* Integrations */}
       <IntegrationsStrip />
-
-      {/* Offerings */}
       <OfferingsSection />
 
-      {/* Industry-specific Advisors */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <ScrollFadeIn>
-            <div className="text-center mb-8 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector Expertise</p>
-              <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry‑Specific AI Advisors</h2>
-              <p className="text-muted-foreground">Select your sector to see dedicated advisor roles:</p>
-            </div>
-            <div className="flex justify-center mb-8">
-              <IndustryToggle active={industry} onChange={setIndustry} />
-            </div>
-          </ScrollFadeIn>
-          <IndustryAdvisors industry={industry} />
-        </div>
-      </section>
+      <div id="advisors">
+        <section className="py-20">
+          <div className="mx-auto max-w-7xl px-6">
+            <ScrollFadeIn>
+              <div className="text-center mb-8 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector Expertise</p>
+                <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry‑Specific AI Advisors</h2>
+                <p className="text-muted-foreground">Select your sector to see dedicated advisor roles:</p>
+              </div>
+              <div className="flex justify-center mb-8">
+                <IndustryToggle active={industry} onChange={setIndustry} />
+              </div>
+            </ScrollFadeIn>
+            <IndustryAdvisors industry={industry} />
+          </div>
+        </section>
+      </div>
 
-      {/* Roadmap */}
-      <RoadmapSection />
+      <div id="roadmap"><RoadmapSection /></div>
 
       {/* Final CTA */}
       <ScrollFadeIn>
