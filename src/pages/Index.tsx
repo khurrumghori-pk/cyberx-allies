@@ -104,46 +104,33 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Challenge: Headcount Gap */}
-      <ChallengeSection />
-
-      {/* Solution */}
-      <SolutionSection />
-
-      {/* Results Stats */}
-      <ResultsStats />
-
-      {/* Steps */}
-      <StepsSection />
-
-      {/* Collaborative Experience */}
+      <div id="challenge"><ChallengeSection /></div>
+      <div id="platform"><SolutionSection /></div>
+      <div id="results"><ResultsStats /></div>
+      <div id="steps"><StepsSection /></div>
       <CollaborativeSection />
-
-      {/* Integrations */}
       <IntegrationsStrip />
-
-      {/* Offerings */}
       <OfferingsSection />
 
-      {/* Industry-specific Advisors */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <ScrollFadeIn>
-            <div className="text-center mb-8 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector Expertise</p>
-              <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry‑Specific AI Advisors</h2>
-              <p className="text-muted-foreground">Select your sector to see dedicated advisor roles:</p>
-            </div>
-            <div className="flex justify-center mb-8">
-              <IndustryToggle active={industry} onChange={setIndustry} />
-            </div>
-          </ScrollFadeIn>
-          <IndustryAdvisors industry={industry} />
-        </div>
-      </section>
+      <div id="advisors">
+        <section className="py-20">
+          <div className="mx-auto max-w-7xl px-6">
+            <ScrollFadeIn>
+              <div className="text-center mb-8 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector Expertise</p>
+                <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry‑Specific AI Advisors</h2>
+                <p className="text-muted-foreground">Select your sector to see dedicated advisor roles:</p>
+              </div>
+              <div className="flex justify-center mb-8">
+                <IndustryToggle active={industry} onChange={setIndustry} />
+              </div>
+            </ScrollFadeIn>
+            <IndustryAdvisors industry={industry} />
+          </div>
+        </section>
+      </div>
 
-      {/* Roadmap */}
-      <RoadmapSection />
+      <div id="roadmap"><RoadmapSection /></div>
 
       {/* Final CTA */}
       <ScrollFadeIn>
