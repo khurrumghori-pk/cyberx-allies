@@ -2,21 +2,18 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  Shield, Zap, ArrowRight, Download, ChevronRight, CheckCircle,
-  MessageSquare, Calendar
+  Shield, ChevronRight, MessageSquare, Calendar, ArrowRight
 } from "lucide-react";
 import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
-import HeroDemoWalkthrough from "@/components/cyberx/HeroDemoWalkthrough";
+import HeroSection from "@/components/cyberx/landing/HeroSection";
 import IndustryToggle, { type IndustryId } from "@/components/cyberx/landing/IndustryToggle";
 import ChallengeSection from "@/components/cyberx/landing/ChallengeSection";
 import SolutionSection from "@/components/cyberx/landing/SolutionSection";
-import ResultsStats from "@/components/cyberx/landing/ResultsStats";
-import StepsSection from "@/components/cyberx/landing/StepsSection";
-import CollaborativeSection from "@/components/cyberx/landing/CollaborativeSection";
-import IntegrationsStrip from "@/components/cyberx/landing/IntegrationsStrip";
+import CoreCapabilitiesSection from "@/components/cyberx/landing/CoreCapabilitiesSection";
 import OfferingsSection from "@/components/cyberx/landing/OfferingsSection";
+import StepsSection from "@/components/cyberx/landing/StepsSection";
+import FAQSection from "@/components/cyberx/landing/FAQSection";
 import IndustryAdvisors from "@/components/cyberx/landing/IndustryAdvisors";
-import RoadmapSection from "@/components/cyberx/landing/RoadmapSection";
 
 const Index = () => {
   const [industry, setIndustry] = useState<IndustryId>("banking");
@@ -27,20 +24,26 @@ const Index = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="font-display text-lg tracking-wide text-foreground">
-              AIgilityX <span className="text-muted-foreground font-normal">|</span> CyberX Advisors
-            </span>
-            <span className="cyberx-pill text-[9px] ml-1">V2</span>
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-border/30 flex items-center justify-center">
+              <span className="font-display text-sm text-foreground">AX</span>
+            </div>
+            <div>
+              <span className="font-display text-base tracking-wide text-foreground block leading-tight">
+                AIgilityX CyberX Advisors
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Cybersecurity Leadership‑as‑a‑Platform
+              </span>
+            </div>
           </div>
           <div className="hidden md:flex items-center gap-1">
             {[
-              { label: "Challenge", id: "challenge" },
+              { label: "Vision", id: "vision" },
               { label: "Platform", id: "platform" },
-              { label: "Results", id: "results" },
-              { label: "How It Works", id: "steps" },
+              { label: "Capabilities", id: "capabilities" },
+              { label: "Engagement", id: "engagement" },
               { label: "Advisors", id: "advisors" },
-              { label: "Roadmap", id: "roadmap" },
+              { label: "FAQ", id: "faq" },
             ].map((nav) => (
               <button
                 key={nav.id}
@@ -62,58 +65,16 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative pt-24 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[120px]" />
+      <HeroSection />
 
-        <div className="relative mx-auto max-w-7xl px-6 pt-8">
-          <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs text-primary">
-              <Zap className="h-3 w-3" /> Agentic Sovereign AI for Cybersecurity
-            </div>
-
-            <h1 className="font-display text-4xl md:text-6xl leading-tight text-foreground">
-              Beyond Assistants.{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Cybersecurity Counterparts.
-              </span>
-            </h1>
-
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Enterprise‑grade AI digital twins for SOC operations, threat intelligence, and security governance — with persistent institutional memory and multi‑agent decisioning.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 pt-2">
-              <Button asChild variant="hero" size="lg" className="text-base px-8">
-                <Link to="/auth">
-                  <Calendar className="mr-2 h-4 w-4" /> Request Demo
-                </Link>
-              </Button>
-              <Button asChild variant="neon" size="lg" className="text-base px-8">
-                <Link to="/install">
-                  <Download className="mr-2 h-4 w-4" /> Install App
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-16">
-            <HeroDemoWalkthrough />
-          </div>
-        </div>
-      </section>
-
-      <div id="challenge"><ChallengeSection /></div>
+      <div id="vision"><ChallengeSection /></div>
       <div id="platform"><SolutionSection /></div>
-      <div id="results"><ResultsStats /></div>
+      <div id="capabilities"><CoreCapabilitiesSection /></div>
+      <div id="engagement"><OfferingsSection /></div>
       <div id="steps"><StepsSection /></div>
-      <CollaborativeSection />
-      <IntegrationsStrip />
-      <OfferingsSection />
 
       <div id="advisors">
-        <section className="py-20">
+        <section className="py-20 bg-secondary/30 border-y border-border/40">
           <div className="mx-auto max-w-7xl px-6">
             <ScrollFadeIn>
               <div className="text-center mb-8 space-y-3">
@@ -130,53 +91,54 @@ const Index = () => {
         </section>
       </div>
 
-      <div id="roadmap"><RoadmapSection /></div>
+      <div id="faq"><FAQSection /></div>
 
       {/* Final CTA */}
-      <ScrollFadeIn>
-        <div className="mx-auto max-w-3xl px-6 mb-16">
-          <div className="cyberx-panel cyberx-signature-glow p-10 text-center space-y-6">
-            <Shield className="h-12 w-12 text-primary mx-auto" />
-            <h2 className="font-display text-2xl md:text-3xl text-foreground">
-              Your Sovereign Cyber Defense Starts Here
-            </h2>
-            <p className="text-muted-foreground">
-              Deploy CyberX Advisors — digital twins that preserve your institutional knowledge, learn continuously, and never leave your organization.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild variant="hero" size="lg" className="text-base px-8">
-                <Link to="/auth">
-                  Request a Demo <ChevronRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="text-base px-8">
-                <Link to="/advisors/dashboard">
-                  <MessageSquare className="mr-2 h-4 w-4" /> View Live Demo
-                </Link>
-              </Button>
+      <section id="contact" className="py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <ScrollFadeIn>
+            <div className="relative rounded-2xl border border-border/30 overflow-hidden p-10 md:p-14 text-center space-y-6"
+              style={{
+                background: "radial-gradient(circle at top right, hsl(var(--primary) / 0.12), transparent 40%), radial-gradient(circle at bottom left, hsl(var(--accent) / 0.14), transparent 40%), linear-gradient(180deg, hsl(var(--card)), hsl(var(--background)))",
+              }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Next move</p>
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">
+                Build the cyber leadership model your future demands.
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                If your organization is ready to move beyond reactive security management and toward an AI‑powered cyber advisory model, AIgilityX CyberX Advisors is ready to help you design the next operating layer.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Button asChild variant="hero" size="lg" className="text-base px-8">
+                  <Link to="/auth">
+                    <Calendar className="mr-2 h-4 w-4" /> Schedule an Executive Briefing
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="text-base px-8">
+                  <Link to="/auth">
+                    Request Pilot Details <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground pt-2">
+                For CISOs, CIOs, boards, regulators, digital transformation leaders, and resilience‑focused institutions.
+              </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 pt-2 text-xs text-muted-foreground">
-              {["70% Triage Offloaded", "MTTD Cut by 40%", "MTTR Reduced 50%", "Continuous Compliance"].map((b) => (
-                <span key={b} className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-accent" /> {b}
-                </span>
-              ))}
-            </div>
-          </div>
+          </ScrollFadeIn>
         </div>
-      </ScrollFadeIn>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-border/40 py-8">
         <div className="mx-auto max-w-7xl px-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Shield className="h-4 w-4 text-primary" />
-            <span>© 2026 AIgilityX CyberX Advisors · Agentic AI · Human‑Machine Symbiosis</span>
+          <div className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">AIgilityX CyberX Advisors</span>
+            <br />
+            AI‑powered cyber advisory for a world that does not wait.
           </div>
-          <div className="flex gap-4 text-xs text-muted-foreground">
-            <Link to="/auth" className="hover:text-foreground">Sign In</Link>
-            <Link to="/install" className="hover:text-foreground">Install App</Link>
-            <Link to="/advisors/dashboard" className="hover:text-foreground">Dashboard</Link>
+          <div className="text-xs text-muted-foreground">
+            © 2026 AIgilityX CyberX Advisors. Human‑led. AI‑accelerated. Strategy‑first.
           </div>
         </div>
       </footer>
