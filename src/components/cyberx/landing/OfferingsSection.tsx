@@ -81,7 +81,7 @@ const OfferingsSection = () => (
               <div className="space-y-2.5 flex-1">
                 {p.features.map((f) => (
                   <div key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-accent mt-0.5 shrink-0" />
                     {f}
                   </div>
                 ))}

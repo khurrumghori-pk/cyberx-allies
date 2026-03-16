@@ -90,8 +90,8 @@ const HeroSection = () => (
                   <p className="text-xs text-muted-foreground mb-1">AIgilityX Operating Signal</p>
                   <p className="font-display text-xl tracking-tight text-foreground">Cyber Advisory Control Tower</p>
                 </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs text-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_hsl(160_60%_50%/0.4)]" />
+                <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-3 py-1.5 text-xs text-accent">
+                  <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_6px_hsl(var(--accent)/0.4)]" />
                   Always‑On
                 </span>
               </div>
