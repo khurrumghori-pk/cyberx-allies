@@ -5,42 +5,24 @@ import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 
 const PLANS = [
   {
-    title: "Executive Readiness Sprint",
-    desc: "Ideal for organizations exploring the platform model and aligning cyber priorities fast.",
+    title: "Readiness Sprint",
     price: "4–6 weeks",
-    unit: "/ advisory sprint",
-    features: [
-      "Cyber posture and leadership gap review",
-      "Board‑level cyber narrative design",
-      "Initial AI advisory use‑case map",
-    ],
-    cta: "Request a Sprint",
+    features: ["Cyber posture gap review", "Board narrative design", "AI use‑case mapping"],
+    cta: "Request Sprint",
     featured: false,
   },
   {
-    title: "Cyber Leadership Platform Pilot",
-    desc: "Best for enterprises or public‑sector bodies validating AI‑powered cyber advisory workflows.",
+    title: "Platform Pilot",
     price: "8–12 weeks",
-    unit: "/ pilot program",
-    features: [
-      "Continuous risk and compliance signal model",
-      "Executive and CISO co‑pilot workflows",
-      "Governance, escalation, and insight dashboards",
-    ],
-    cta: "Start the Pilot",
+    features: ["Continuous risk & compliance signals", "CISO co‑pilot workflows", "Governance dashboards"],
+    cta: "Start Pilot",
     featured: true,
   },
   {
-    title: "Strategic Advisory Partnership",
-    desc: "For institutions building repeatable cyber leadership capability over time.",
+    title: "Strategic Partnership",
     price: "Ongoing",
-    unit: "/ retained partnership",
-    features: [
-      "Operating model and governance evolution",
-      "Human + AI advisory orchestration",
-      "Executive briefings and strategic roadmap support",
-    ],
-    cta: "Discuss Partnership",
+    features: ["Operating model evolution", "Human + AI orchestration", "Executive briefings & roadmap"],
+    cta: "Discuss",
     featured: false,
   },
 ];
@@ -49,14 +31,11 @@ const OfferingsSection = () => (
   <section className="py-20">
     <div className="mx-auto max-w-7xl px-6">
       <ScrollFadeIn>
-        <div className="space-y-3 mb-10">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Engagement models</p>
-          <h2 className="font-display text-2xl md:text-4xl text-foreground leading-tight max-w-[20ch]">
-            Flexible ways to activate the platform.
+        <div className="space-y-2 mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Engagement</p>
+          <h2 className="font-display text-2xl md:text-4xl text-foreground leading-tight">
+            Start where you are.
           </h2>
-          <p className="text-muted-foreground max-w-3xl">
-            Whether you are starting with an advisory sprint or building a longer‑term cyber leadership capability, the model adapts to your maturity, regulatory exposure, and executive ambition.
-          </p>
         </div>
       </ScrollFadeIn>
 
@@ -64,8 +43,8 @@ const OfferingsSection = () => (
         {PLANS.map((p, i) => (
           <ScrollFadeIn key={p.title} delay={i * 100}>
             <div
-              className={`cyberx-panel p-6 space-y-5 h-full flex flex-col relative overflow-hidden ${
-                p.featured ? "border-primary/40 ring-1 ring-primary/20 -translate-y-1" : ""
+              className={`cyberx-panel p-6 space-y-4 h-full flex flex-col relative overflow-hidden ${
+                p.featured ? "border-primary/40 ring-1 ring-primary/20" : ""
               }`}
             >
               {p.featured && (
@@ -74,11 +53,8 @@ const OfferingsSection = () => (
                 </span>
               )}
               <h3 className="font-display text-lg text-foreground">{p.title}</h3>
-              <p className="text-sm text-muted-foreground">{p.desc}</p>
-              <p className="font-display text-3xl text-foreground tracking-tight">
-                {p.price} <span className="text-sm font-normal text-muted-foreground">{p.unit}</span>
-              </p>
-              <div className="space-y-2.5 flex-1">
+              <p className="font-display text-2xl text-foreground tracking-tight">{p.price}</p>
+              <div className="space-y-2 flex-1">
                 {p.features.map((f) => (
                   <div key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <CheckCircle className="h-4 w-4 text-accent mt-0.5 shrink-0" />

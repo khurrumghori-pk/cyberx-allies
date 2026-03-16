@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Shield, ChevronRight, MessageSquare, Calendar, ArrowRight
-} from "lucide-react";
+import { Calendar, ArrowRight } from "lucide-react";
 import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 import HeroSection from "@/components/cyberx/landing/HeroSection";
 import IndustryToggle, { type IndustryId } from "@/components/cyberx/landing/IndustryToggle";
@@ -27,14 +25,9 @@ const Index = () => {
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-border/30 flex items-center justify-center">
               <span className="font-display text-sm text-foreground">AX</span>
             </div>
-            <div>
-              <span className="font-display text-base tracking-wide text-foreground block leading-tight">
-                AIgilityX CyberX Advisors
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                Cybersecurity Leadership‑as‑a‑Platform
-              </span>
-            </div>
+            <span className="font-display text-base tracking-wide text-foreground">
+              CyberX Advisors
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-1">
             {[
@@ -77,10 +70,9 @@ const Index = () => {
         <section className="py-20 bg-secondary/30 border-y border-border/40">
           <div className="mx-auto max-w-7xl px-6">
             <ScrollFadeIn>
-              <div className="text-center mb-8 space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector Expertise</p>
-                <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry‑Specific AI Advisors</h2>
-                <p className="text-muted-foreground">Select your sector to see dedicated advisor roles:</p>
+              <div className="text-center mb-8 space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-accent">Sector expertise</p>
+                <h2 className="font-display text-2xl md:text-4xl text-foreground">Industry AI Advisors</h2>
               </div>
               <div className="flex justify-center mb-8">
                 <IndustryToggle active={industry} onChange={setIndustry} />
@@ -94,52 +86,40 @@ const Index = () => {
       <div id="faq"><FAQSection /></div>
 
       {/* Final CTA */}
-      <section id="contact" className="py-20">
+      <section className="py-20">
         <div className="mx-auto max-w-4xl px-6">
           <ScrollFadeIn>
-            <div className="relative rounded-2xl border border-border/30 overflow-hidden p-10 md:p-14 text-center space-y-6"
+            <div
+              className="relative rounded-2xl border border-border/30 overflow-hidden p-10 md:p-14 text-center space-y-5"
               style={{
                 background: "radial-gradient(circle at top right, hsl(var(--primary) / 0.12), transparent 40%), radial-gradient(circle at bottom left, hsl(var(--accent) / 0.14), transparent 40%), linear-gradient(180deg, hsl(var(--card)), hsl(var(--background)))",
               }}
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Next move</p>
               <h2 className="font-display text-2xl md:text-3xl text-foreground">
-                Build the cyber leadership model your future demands.
+                Ready to lead faster than threats evolve?
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                If your organization is ready to move beyond reactive security management and toward an AI‑powered cyber advisory model, AIgilityX CyberX Advisors is ready to help you design the next operating layer.
-              </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button asChild variant="hero" size="lg" className="text-base px-8">
                   <Link to="/auth">
-                    <Calendar className="mr-2 h-4 w-4" /> Schedule an Executive Briefing
+                    <Calendar className="mr-2 h-4 w-4" /> Book a Briefing
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="text-base px-8">
                   <Link to="/auth">
-                    Request Pilot Details <ArrowRight className="ml-2 h-4 w-4" />
+                    Request Pilot <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground pt-2">
-                For CISOs, CIOs, boards, regulators, digital transformation leaders, and resilience‑focused institutions.
-              </p>
             </div>
           </ScrollFadeIn>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 py-8">
+      <footer className="border-t border-border/40 py-6">
         <div className="mx-auto max-w-7xl px-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">AIgilityX CyberX Advisors</span>
-            <br />
-            AI‑powered cyber advisory for a world that does not wait.
-          </div>
-          <div className="text-xs text-muted-foreground">
-            © 2026 AIgilityX CyberX Advisors. Human‑led. AI‑accelerated. Strategy‑first.
-          </div>
+          <span className="text-sm font-semibold text-foreground">AIgilityX CyberX Advisors</span>
+          <span className="text-xs text-muted-foreground">© 2026 · Human‑led. AI‑accelerated.</span>
         </div>
       </footer>
     </main>

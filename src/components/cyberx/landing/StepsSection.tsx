@@ -1,24 +1,21 @@
 import ScrollFadeIn from "@/components/cyberx/ScrollFadeIn";
 
 const STEPS = [
-  { num: "01", title: "Assess", desc: "Identify cyber leadership gaps, fragmented workflows, and decision bottlenecks." },
-  { num: "02", title: "Design", desc: "Define the advisory model, AI roles, human oversight, and executive reporting needs." },
-  { num: "03", title: "Activate", desc: "Launch the pilot with real signals, real governance, and measurable leadership use cases." },
-  { num: "04", title: "Scale", desc: "Expand across functions, subsidiaries, geographies, or sector‑specific regulatory contexts." },
+  { num: "01", title: "Assess", desc: "Find leadership gaps and decision bottlenecks." },
+  { num: "02", title: "Design", desc: "Define AI roles, human oversight, and reporting." },
+  { num: "03", title: "Activate", desc: "Launch with real signals and governance." },
+  { num: "04", title: "Scale", desc: "Expand across functions and geographies." },
 ];
 
 const StepsSection = () => (
   <section className="py-20">
     <div className="mx-auto max-w-7xl px-6">
       <ScrollFadeIn>
-        <div className="space-y-3 mb-10">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Implementation journey</p>
-          <h2 className="font-display text-2xl md:text-4xl text-foreground leading-tight max-w-[24ch]">
-            How organizations move from concept to cyber command advantage.
+        <div className="space-y-2 mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Journey</p>
+          <h2 className="font-display text-2xl md:text-4xl text-foreground leading-tight">
+            Concept to command in four steps.
           </h2>
-          <p className="text-muted-foreground max-w-3xl">
-            The transition is practical. Start with visibility. Layer intelligence. Establish governance. Scale the advisory model where it matters most.
-          </p>
         </div>
       </ScrollFadeIn>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
