@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Zap, Calendar, ArrowRight } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
+import heroBgVideo from "@/assets/hero-bg-video.mp4.asset.json";
 
 const HERO_STATS = [
   { value: "24/7", desc: "Always‑on risk visibility" },
@@ -37,27 +38,76 @@ const signalItem: Variants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
 };
 
+const PARTICLES = Array.from({ length: 40 }, (_, i) => ({
+  id: i,
+  x: (i * 37 + 13) % 100,
+  y: (i * 53 + 7) % 100,
+  size: 1.5 + (i % 3),
+  duration: 4 + (i % 5) * 1.5,
+  delay: (i % 7) * 0.6,
+}));
+
 const HeroSection = () => (
   <section className="relative pt-28 pb-12 overflow-hidden">
+    {/* Background video */}
+    <div className="absolute inset-0 z-0">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-30"
+        src={heroBgVideo.url}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+    </div>
+
+    {/* Particle grid overlay */}
+    <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 cyberx-grid-bg opacity-20" />
+      {PARTICLES.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full bg-primary/40"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.2, 0.7, 0.2],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: p.delay,
+          }}
+        />
+      ))}
+    </div>
+
     {/* Animated background orbs */}
-    <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+    <div className="absolute inset-0 z-[1] bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
     <motion.div
-      className="absolute top-20 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px]"
+      className="absolute top-20 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] z-[1]"
       animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
     />
     <motion.div
-      className="absolute top-40 right-1/4 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px]"
+      className="absolute top-40 right-1/4 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px] z-[1]"
       animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
       transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
     />
     <motion.div
-      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] rounded-full bg-primary/3 blur-[140px]"
+      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] rounded-full bg-primary/3 blur-[140px] z-[1]"
       animate={{ opacity: [0.15, 0.3, 0.15] }}
       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
     />
 
-    <div className="relative mx-auto max-w-7xl px-6">
+    <div className="relative z-10 mx-auto max-w-7xl px-6">
       <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
         {/* Left */}
         <motion.div
@@ -142,7 +192,6 @@ const HeroSection = () => (
               </motion.span>
             </div>
 
-            {/* Stats grid with stagger */}
             <motion.div
               className="grid grid-cols-2 gap-3"
               variants={containerVariants}
@@ -163,7 +212,6 @@ const HeroSection = () => (
               ))}
             </motion.div>
 
-            {/* Signal rows with stagger */}
             <motion.div
               className="rounded-xl border border-border/30 bg-secondary/30 backdrop-blur-sm p-4 space-y-1"
               variants={signalVariants}
