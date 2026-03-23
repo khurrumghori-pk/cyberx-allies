@@ -32,9 +32,9 @@ const signalVariants = {
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.7 } },
 };
 
-const signalItem = {
+const signalItem: Variants = {
   hidden: { opacity: 0, x: 12 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
 };
 
 const HeroSection = () => (
